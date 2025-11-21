@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listing Details - REFERALLS</title>
+<style>
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+  }
+
+  header {
+    background: #008000;
+    color: white;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .container {
+    max-width: 850px;
+    background: white;
+    margin: 40px auto;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .listing-img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  h2 {
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .price {
+    color: #008000;
+    font-size: 22px;
+    font-weight: bold;
+  }
+
+  .description {
+    margin: 20px 0;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  .seller-box {
+    display: flex;
+    align-items: center;
+    background: #e8ffe8;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 25px;
+    gap: 15px;
+  }
+
+  .seller-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #008000;
+  }
+
+  .seller-info {
+    flex: 1;
+  }
+
+  .seller-info h3 {
+    margin: 5px 0;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .verified-badge {
+    background: #008000;
+    color: white;
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 5px;
+  }
+
+  button {
+    background: #008000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+
+  button:hover {
+    background: #006400;
+  }
+
+  .safety-note {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #b22222;
+    background: #fff3f3;
+    padding: 10px;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Listing Details</h1>
+</header>
+
+<div class="container">
+  <img id="listingImage" class="listing-img" src="" alt="Listing Image">
+
+  <h2 id="listingTitle"></h2>
+  <p id="listingCategory"></p>
+  <p class="price" id="listingPrice"></p>
+  <p class="description" id="listingDescription"></p>
+
+  <div class="seller-box">
+    <img id="sellerPhoto" class="seller-photo" src="images/default-user.jpg" alt="Seller Photo">
+    <div class="seller-info">
+      <h3>
+        <span id="sellerName">John Doe</span>
+        <span id="verifiedBadge" class="verified-badge" style="display:none;">✔ Verified</span>
+      </h3>
+      <button id="chatSellerBtn">💬 Chat Seller</button>
+    </div>
+  </div>
+
+  <div class="safety-note">
+    ⚠️ All transactions are advised to be made only on REFERALLS. Any transaction made outside the site is at users’ own risk.
+  </div>
+
+  <button onclick="goBack()">← Back to Dashboard</button>
+</div>
+
+<script>
+  const listing = JSON.parse(localStorage.getItem("selectedListing"));
+
+  if (listing) {
+    // ✅ Updated backend address
+    document.getElementById("listingImage").src = " http://192.168.43.29:59414" + listing.image;
+    document.getElementById("listingTitle").innerText = listing.title;
+    document.getElementById("listingCategory").innerText = "Category: " + listing.category;
+    document.getElementById("listingPrice").innerText = "₦" + listing.price;
+    document.getElementById("listingDescription").innerText = listing.description || "No description available.";
+    document.getElementById("sellerName").innerText = listing.sellerName || "John Doe";
+    document.getElementById("sellerPhoto").src = listing.sellerPhoto || "images/default-user.jpg";
+
+    if (listing.verifiedSeller === true) {
+      document.getElementById("verifiedBadge").style.display = "inline-block";
+    }
+
+    // ✅ ensure seller email exists (needed for chat.js)
+    if (!listing.sellerEmail) {
+      listing.sellerEmail = "seller@example.com"; // placeholder for now
+      localStorage.setItem("selectedListing", JSON.stringify(listing));
+    }
+    console.log("✅ Seller email set as:", listing.sellerEmail);
+
+  } else {
+    document.querySelector(".container").innerHTML = "<p>Listing not found.</p>";
+  }
+
+  function goBack() {
+    window.location.href = "index.html";
+  }
+
+  document.getElementById("chatSellerBtn").addEventListener("click", function() {
+    openChatWithSeller();
+  });
+</script>
+
+<!-- Chat system -->
+<script src="chat.js"></script>
+</body>
+</html>

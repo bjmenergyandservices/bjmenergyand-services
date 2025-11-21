@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - REFERALLS</title>
+  <link rel="stylesheet" href="./assets/css/access.css">
+</head>
+
+<body class="log">
+
+  <div class="container">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button id="loginBtn">Login</button>
+    <p>Don't have an account? <a href="signup.html">Create one</a></p>
+  </div>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password) {
+    alert("Please enter both email and password");
+    return;
+  }
+
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+    // Optional: save user info in localStorage for later
+    localStorage.setItem("user", JSON.stringify({
+      uid: userCred.user.uid,
+      email: userCred.user.email
+    }));
+
+    alert("Welcome " + email + "!");
+    window.location.href = "index.html";
+  } catch (err) {
+    alert("Error: " + err.message);
+    console.error(err);
+  }
+}
+
+// Attach login function to the button
+document.getElementById("loginBtn").addEventListener("click", login);
+
+console.log("Firebase connected on login.html");
+</script>
+
+</body>
+</html>

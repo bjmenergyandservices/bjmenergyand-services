@@ -1,226 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BJM Energy & Services</title>
-<style>
-  body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f9f9f9; color: #222; }
-  header { background: #0a2342; color: #f9f9f9; text-align: center; padding: 2rem 1rem; }
-  header h1 { margin: 0; font-size: 2.2rem; }
-  header p { margin-top: 0.5rem; font-size: 1.1rem; color: #ffcc33; }
-
-  nav { background: #0f2b59; display: flex; justify-content: center; flex-wrap: wrap; }
-  nav a { color: white; text-decoration: none; padding: 1rem; font-weight: 500; }
-  nav a:hover { background: #ffcc33; color: #0a2342; }
-
-  .banner {
-    background-image:url('onsitepractical3.jpg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height:100vh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #0c0c0c;
-    text-align: center;
-    font-size: 2em;
-  }
-
-  .banner::before {
-    content: "";
-    position: absolute;
-    top:0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 0;
-  }
-
-  .banner-content {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-  }
-
-  .banner h1 {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-  }
-
-  .banner p {
-    font-size: 1.2rem;
-  }
-
-  @media (max-width:768px) {
-    .banner { height: 80vh; }
-    .banner h1 { font-size: 1.8rem; }
-    .banner p { font-size: 1rem; }
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
-  .banner { position: relative; }
-
-  .hero {
-    background-color: #092056;
-    background-image:none;
-    background-position: center;
-    height: 70vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgb(254, 254, 254);
-    text-shadow: 2px 2px 5px #000;
-    position:relative;
-    bottom: 50px;
-  }
-  .hero h2 { background: rgba(0,0,0,0.5); padding: 1rem 2rem; border-radius: 5px; }
-
-  section { padding: 3rem 1.5rem; max-width: 1100px; margin: auto; }
-  h2.section-title { color: #0a2342; border-bottom: 2px solid #ffcc33; display: inline-block; padding-bottom: .3rem; }
-
-  .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 1rem; }
-  .service { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.1); padding: 1rem; text-align: center; }
-
-  .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1.5rem; margin-top: 2rem; }
-  .product { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.1); transition: transform .3s; }
-  .product:hover { transform: translateY(-5px); }
-  .product img { width: 100%; height: 180px; object-fit: cover; }
-  .product .info { padding: 1rem; }
-  .product .info h3 { color: #0a2342; margin: 0 0 .5rem; font-size: 1.1rem; }
-  .product button { background: #ffcc33; border: none; padding: .5rem 1rem; border-radius: 5px; cursor: pointer; }
-  .product button:hover { background: #0a2342; color: white; }
-
-  .gallery { display: flex; overflow-x: auto; gap: 1rem; padding: 1rem 0; scroll-snap-type: x mandatory; }
-  .gallery img { flex: 0 0 auto; width: 280px; height: 200px; border-radius: 10px; object-fit: cover; scroll-snap-align: start; }
-
-  form { display: grid; gap: .7rem; max-width: 500px; margin: auto; }
-  input, textarea { padding: .6rem; border: 1px solid #ccc; border-radius: 5px; }
-  button.submit { background: #ffcc33; border: none; padding: .7rem; border-radius: 5px; cursor: pointer; font-weight: 600; }
-  button.submit:hover { background: #0a2342; color: white; }
-
-  footer { background: #0a2342; color: white; text-align: center; padding: 2rem 1rem; margin-top: 3rem; }
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REFERALLS Marketplace</title>
+<link rel="stylesheet" href="./assets/css/index.css">
 </head>
 <body>
 
-<header>
-  <h1>BJM Energy & Services</h1>
-  <p>Powering Tomorrow with Clean Energy</p>
-</header>
-
-<nav>
-  <a href="#services">Our Services</a>
-  <a href="#products">Products</a>
-  <a href="#training">Training</a>
-  <a href="#quote">Get Quote</a>
-  <a href="#contact">Contact</a>
-</nav>
-
-<div class="banner">
-  <img src="./images/onsitepractical3.jpg.jpg">
+<div class="navbar">
+  <div class="navbar-min">
+      <h1>REFERALLS</h1>
+      <div class="access">
+        <button onclick="window.location.href='upload.html'">+ Post Your Listing</button>
+        <span class="profile-icon" title="Profile" onclick="goToDashboard()">👤</span>
+      </div>
+  </div>
 </div>
 
-<div class="hero">
-  <h2>Clean, Reliable, and Affordable Energy Solutions</h2>
+<div class="search-section">
+  <div class="search-min">
+    <select id="categorySelect">
+      <option value="">All Categories</option>
+      <option value="House">Houses</option>
+      <option value="Car">Cars</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="I am looking for...">
+    <button id="searchBtn">Search</button>
+  </div>
 </div>
 
-<section id="services">
-  <h2 class="section-title">Our Services</h2>
-  <div class="services">
-    <div class="service"><h3>Solar Equipment Sales</h3><p>Top-quality panels, inverters, and batteries at competitive prices.</p></div>
-    <div class="service"><h3>Installation & Maintenance</h3><p>Professional solar and inverter installations for homes and industries.</p></div>
-    <div class="service"><h3>Energy Auditing & Design</h3><p>We evaluate your energy needs and design the most efficient solutions.</p></div>
-    <div class="service"><h3>Instrumentation Training</h3><p>Hands-on technical training for aspiring solar and instrumentation professionals.</p></div>
+<div class="categories">
+  <div class="category-card" onclick="filterCategory('House')">
+    <img src="images/house.png" alt="House">
+    <h3>Houses</h3>
   </div>
-</section>
-
-<section id="products">
-  <h2 class="section-title">Our Products</h2>
-  <p>scroll through our available product.</p>
-  <div class="gallery">
-    <img src="./images/solarcable1.jpg" alt="1st">
-     <img src="./images/solar flood light.jpg.webp" alt="2nd">
-      <img src="./images/charge controller.jpg.webp" alt="3rd">
-       <img src="./images/DC breaker.jpg.webp" alt="4th">
-        <img src="./images/solargenerator.jpg.webp" alt="5th">
-         <img src="./images/solarpump.jpg.webp" alt="6th">
-          <img src="./images/solarcctv.jpg.webp" alt="7th">
-           <img src="./images/solarcctv1.jpg.webp" alt="9th">
+  <div class="category-card" onclick="filterCategory('Car')">
+    <img src="images/car.jpg" alt="Car">
+    <h3>Cars</h3>
   </div>
-  <!-- Products kept unchanged -->
-</section>
+</div>
 
-<section id="training">
-  <h2 class="section-title">Training Gallery</h2>
-  <p>At BJM, we provide comprehensive, hands-on training programs designed for aspiring professionals in both instrumentation and solar energy installation. Our courses cover a wide range of practical skills, from advanced instrumentation techniques to solar panel installation, inverter setup, battery management, and energy auditing. Trainees gain real-world experience, industry knowledge, and technical expertise that prepare them to excel in modern technical and renewable energy fields. Whether you’re looking to enhance your career or start a new venture in energy solutions, BJM Training equips you with the tools and confidence to succeed.</p> <br>
-  <p> <h2>Scroll through our recent training sessions.</h2></p>
-  <div class="gallery">
-    <img src="./images/trainingsection.jpg.jpg" alt="1st" >
-    <img src="./images/traininsection2.jpg.jpg" alt="2nd">
-    <img src="./images/teabreak.jpg.jpg" alt="3rd">
-    <img src="./images/onsitepractical.jpg.jpg" alt="4th">
-    <img src="./images/onsitepractical2.jpg.jpg" alt="5th">
-    <img src="./images/onsitepractical3.jpg.jpg" alt="6th">
-    <img src="./images/groupphoto.jpg.jpg" alt="7th">
-  </div>
-</section>
+<h2 style="text-align:center;">Trending Listings</h2>
+<div class="listings" id="listingsContainer"></div>
 
-<section id="quote">
-  <form action="" onsubmit="return sendWhatsApp(this)">
-  <input type="text" name="name" placeholder="Your Name" required />
-  <input type="text" name="phone" placeholder="Your Phone Number" required />
-  <textarea name="details" placeholder="Project Details" required></textarea>
-  <button class="submit" type="submit">Send Quote via WhatsApp</button>
-</form>
+<footer>© 2025 REFERALLS. All Rights Reserved.</footer>
 
-</section>
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-<footer id="contact">
-  <p>📞 08035525865 | ✉️ bjmenergyandservices@gmail.com</p>
-  <p>📍 Eneka, Port Harcourt, Nigeria</p>
-  <p>&copy; 2025 BJM Energy & Services. All rights reserved.</p>
-</footer>
+// Dashboard/Profile button
+function goToDashboard() {
+  const user = auth.currentUser;
+  if (user) window.location.href = "dashboard.html";
+  else window.location.href = "login.html";
+}
 
+// Fetch listings from Firestore
+async function fetchListings(category = "", searchText = "") {
+  const listingsCol = collection(db, "listings");
+  let q;
 
-<script>
-function sendQuote(e) {
-  e.preventDefault(); // stop normal form submission
+  if (category && searchText) {
+    q = query(listingsCol, where("category", "==", category));
+    // Simple client-side filter for search text
+  } else if (category) {
+    q = query(listingsCol, where("category", "==", category));
+  } else {
+    q = query(listingsCol, orderBy("createdAt", "desc"));
+  }
 
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const details = document.getElementById("details").value.trim();
+  const snapshot = await getDocs(q);
+  let listings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  if (!name || !phone || !details) {
-    alert("Please fill in all fields.");
+  // Filter client-side by search text if needed
+  if (searchText) {
+    const lower = searchText.toLowerCase();
+    listings = listings.filter(l => 
+      l.title.toLowerCase().includes(lower) ||
+      l.description.toLowerCase().includes(lower)
+    );
+  }
+
+  displayListings(listings);
+}
+
+// Display listings
+function displayListings(listings) {
+  const container = document.getElementById("listingsContainer");
+  container.innerHTML = "";
+
+  if (listings.length === 0) {
+    container.innerHTML = "<p style='text-align:center;'>No listings found.</p>";
     return;
   }
 
-  const businessNumber = "2348035525865"; // Replace with your WhatsApp number
-
-  const message = encodeURIComponent(
-    `Hello BJM Energy & Services,%0A%0AQuote Request:%0AName: ${name}%0APhone: ${phone}%0ADetails: ${details}`
-  );
-
-  // ✅ Show alert before opening WhatsApp
-  alert("Your quote message is ready! WhatsApp will open next. Please tap Send.");
-
-  window.open(`https://wa.me/${businessNumber}?text=${message}`, "_blank");
-
-  e.target.reset();
+  listings.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "listing";
+    div.innerHTML = `
+      <img src="${item.imageURL}" alt="${item.title}" style="cursor:pointer;">
+      <div class="details">
+        <h4>${item.title}</h4>
+        <p>${item.category}</p>
+        <p>₦${item.price}</p>
+        <p>${item.description}</p>
+      </div>
+    `;
+    div.addEventListener("click", () => {
+      localStorage.setItem("selectedListing", JSON.stringify(item));
+      window.location.href = "details.html";
+    });
+    container.appendChild(div);
+  });
 }
-</script>
 
+// Filter by category
+function filterCategory(cat) {
+  document.getElementById("categorySelect").value = cat;
+  const searchText = document.getElementById("searchInput").value.trim();
+  fetchListings(cat, searchText);
+}
+
+// Search button
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const cat = document.getElementById("categorySelect").value;
+  const text = document.getElementById("searchInput").value.trim();
+  fetchListings(cat, text);
+});
+
+// Initial load
+fetchListings();
+
+window.addEventListener("scroll", function(){
+  const header = document.querySelector(".navbar");
+  header.classList.toggle("sticky", window.scrollY > 0);
+});
+
+console.log("Firebase connected on index.html");
 </script>
 
 </body>
