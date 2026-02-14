@@ -1,0 +1,3548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barclays Online Banking</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* Barclays Style - UNCHANGED */
+        :root {
+            --barclays-blue: #00aeef;
+            --barclays-dark: #1e1e1e;
+            --barclays-light: #f8f9fa;
+            --barclays-gray: #6c757d;
+            --barclays-border: #dee2e6;
+            --barclays-success: #28a745;
+            --barclays-error: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Header - UNCHANGED */
+        .header {
+            background: var(--barclays-dark);
+            color: white;
+            padding: 20px 0;
+            border-bottom: 4px solid var(--barclays-blue);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .logo span {
+            color: var(--barclays-blue);
+        }
+        
+        /* Main Container - UNCHANGED */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Form Sections - UNCHANGED */
+        .form-section {
+            padding: 40px;
+        }
+        
+        .form-header {
+            border-bottom: 1px solid var(--barclays-border);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h1 {
+            font-size: 28px;
+            color: var(--barclays-dark);
+            margin-bottom: 10px;
+        }
+        
+        .form-header p {
+            color: var(--barclays-gray);
+            font-size: 16px;
+        }
+        
+        /* Progress Steps - UNCHANGED */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--barclays-border);
+            z-index: 1;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--barclays-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            color: var(--barclays-gray);
+        }
+        
+        .step.active .step-circle {
+            background: var(--barclays-blue);
+            border-color: var(--barclays-blue);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            color: var(--barclays-gray);
+        }
+        
+        .step.active .step-label {
+            color: var(--barclays-blue);
+            font-weight: bold;
+        }
+        
+        /* Form Groups - UNCHANGED */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--barclays-dark);
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--barclays-border);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--barclays-blue);
+            box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.1);
+        }
+        
+        .date-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .radio-group {
+            border: 1px solid var(--barclays-border);
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .radio-option {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .radio-option input[type="radio"] {
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+        
+        .radio-option label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .radio-description {
+            font-size: 14px;
+            color: var(--barclays-gray);
+            margin-top: 5px;
+            margin-left: 25px;
+        }
+        
+        /* Button Styles - UNCHANGED */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--barclays-border);
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--barclays-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0099d6;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: var(--barclays-success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: var(--barclays-error);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        
+        .btn-link {
+            background: none;
+            color: var(--barclays-blue);
+            text-decoration: underline;
+            padding: 12px 0;
+        }
+        
+        /* Alert Messages - UNCHANGED */
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* FAQ Section - UNCHANGED */
+        .faq-section {
+            background: var(--barclays-light);
+            padding: 30px;
+            margin-top: 30px;
+            border-top: 1px solid var(--barclays-border);
+        }
+        
+        .faq-section h3 {
+            margin-bottom: 20px;
+            color: var(--barclays-dark);
+        }
+        
+        .faq-list {
+            list-style: none;
+        }
+        
+        .faq-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .faq-list li:before {
+            content: '•';
+            color: var(--barclays-blue);
+            position: absolute;
+            left: 0;
+        }
+        
+        /* Footer - UNCHANGED */
+        .footer {
+            background: var(--barclays-light);
+            padding: 40px 0;
+            margin-top: 40px;
+            border-top: 1px solid var(--barclays-border);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--barclays-gray);
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: var(--barclays-blue);
+        }
+        
+        .footer-disclaimer {
+            text-align: center;
+            color: var(--barclays-gray);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Admin Panel - UNCHANGED */
+        .admin-panel {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--barclays-border);
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .user-table th,
+        .user-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--barclays-border);
+            vertical-align: top;
+        }
+        
+        .user-table th {
+            background: var(--barclays-light);
+            font-weight: 600;
+            color: var(--barclays-dark);
+        }
+        
+        .user-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Hidden class - UNCHANGED */
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Dashboard Styles - UNCHANGED */
+        .dashboard {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+        
+        .dashboard-header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .account-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            color: var(--barclays-gray);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .balance {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--barclays-dark);
+        }
+        
+        .account-number {
+            font-family: monospace;
+            font-size: 18px;
+            color: var(--barclays-blue);
+        }
+        
+        /* Login Options - UNCHANGED */
+        .login-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--barclays-border);
+            padding-bottom: 10px;
+        }
+        
+        .login-option {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--barclays-gray);
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+        }
+        
+        .login-option.active {
+            color: var(--barclays-blue);
+            font-weight: 600;
+        }
+        
+        .login-option.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--barclays-blue);
+        }
+        
+        /* Checkbox - UNCHANGED */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 3px;
+        }
+        
+        /* Transaction Modal - UNCHANGED */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Quick Actions - UNCHANGED */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        /* Admin Edit Balance - UNCHANGED */
+        .balance-edit {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .balance-edit input {
+            width: 120px;
+            padding: 8px 12px;
+            border: 1px solid var(--barclays-border);
+            border-radius: 4px;
+        }
+        
+        /* Transfer Form - UNCHANGED */
+        .transfer-form {
+            background: var(--barclays-light);
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .info-text {
+            background: #e7f3fe;
+            border-left: 4px solid var(--barclays-blue);
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: var(--barclays-dark);
+        }
+        
+        /* Bank Receipt - UNCHANGED */
+        .bank-receipt {
+            background: white;
+            border: 2px solid var(--barclays-blue);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid var(--barclays-blue);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .receipt-details {
+            margin: 25px 0;
+        }
+        
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--barclays-border);
+        }
+        
+        .receipt-footer {
+            background: var(--barclays-light);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px solid var(--barclays-border);
+        }
+        
+        .processing-time {
+            color: var(--barclays-error);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .contact-info {
+            color: var(--barclays-blue);
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        /* Print Button - UNCHANGED */
+        .print-btn {
+            background: var(--barclays-success);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .print-btn:hover {
+            background: #218838;
+        }
+        
+        /* Account Details Card - UNCHANGED */
+        .account-details-card {
+            background: linear-gradient(135deg, var(--barclays-blue) 0%, #0066cc 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .account-details-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* ATM Card Request - UNCHANGED */
+        .atm-card-request {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        /* International Transfer Options - UNCHANGED */
+        .transfer-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .transfer-option-btn {
+            background: white;
+            border: 2px solid var(--barclays-border);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .transfer-option-btn:hover {
+            border-color: var(--barclays-blue);
+            background: #f8f9fa;
+        }
+        
+        .transfer-option-btn.active {
+            border-color: var(--barclays-blue);
+            background: #e7f3fe;
+        }
+        
+        /* International Transfer Fields - UNCHANGED */
+        .international-fields {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid var(--barclays-border);
+        }
+        
+        /* Copy to Clipboard - UNCHANGED */
+        .copy-btn {
+            background: var(--barclays-gray);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #5a6268;
+        }
+        
+        /* Admin Transaction Editor - UNCHANGED */
+        .transaction-editor {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid var(--barclays-border);
+        }
+        
+        .transaction-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+            border: 1px solid var(--barclays-border);
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .transaction-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--barclays-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* Admin Controls - UNCHANGED */
+        .admin-controls-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid var(--barclays-border);
+        }
+        
+        .admin-controls-panel h3 {
+            margin-bottom: 15px;
+            color: var(--barclays-dark);
+        }
+        
+        .admin-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Email Preview - UNCHANGED */
+        .email-preview {
+            background: white;
+            border: 2px solid var(--barclays-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .email-header {
+            border-bottom: 1px solid var(--barclays-border);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .email-content {
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - UNCHANGED -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo" onclick="showHomePage()">BARCLAYS</a>
+            <div id="userMenu">
+                <button id="adminLoginBtn" class="btn btn-secondary" onclick="showAdminLogin()" style="display: none;">Admin</button>
+                <button id="logoutBtn" class="btn btn-secondary" onclick="logoutUser()" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Registration Form - UNCHANGED -->
+    <div id="registrationSection" class="container">
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Register for Online Banking</h1>
+                <p>It only takes a few minutes</p>
+            </div>
+            
+            <!-- Progress Steps - UNCHANGED -->
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Your Details</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Review</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Complete</div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Your Details - UNCHANGED -->
+            <div id="step1Form">
+                <div class="form-group">
+                    <label>Last name</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Date of birth (DD/MM/YYYY)</label>
+                    <div class="date-inputs">
+                        <input type="number" id="birthDay" placeholder="DD" min="1" max="31" required>
+                        <input type="number" id="birthMonth" placeholder="MM" min="1" max="12" required>
+                        <input type="number" id="birthYear" placeholder="YYYY" min="1900" max="2025" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Postcode</label>
+                    <input type="text" id="postcode" required>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="cancelRegistration()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Account Details - UNCHANGED -->
+            <div id="step2Form" class="hidden">
+                <div class="form-group">
+                    <label>Select the type of account you have</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="accountCurrent" name="accountType" value="current" checked>
+                            <label for="accountCurrent">Current or savings account</label>
+                            <div class="radio-description">
+                                If you have a mortgage with us, as well as a current or savings account, choose this option.
+                            </div>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="accountMortgage" name="accountType" value="mortgage">
+                            <label for="accountMortgage">Mortgage account</label>
+                            <div class="radio-description">
+                                If you only have a mortgage account with us, choose this option.
+                            </div>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="accountMerchant" name="accountType" value="merchant">
+                            <label for="accountMerchant">Merchant</label>
+                            <div class="radio-description">
+                                If you're a merchant customer and you don't have any other accounts with us, choose this option.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sort code</label>
+                    <input type="text" id="sortCode" placeholder="20-00-00" required pattern="[0-9]{2}-[0-9]{2}-[0-9]{2}">
+                    <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                        This is the 6-digit number on the front of your debit or authentication card.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Card number (16 digits)</label>
+                    <input type="text" id="cardNumber" minlength="16" maxlength="16" required pattern="[0-9]{16}">
+                    <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                        This is the 16-digit number on the front of your debit or authentication card.
+                    </small>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep(1)">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Contact Details & Password - UNCHANGED -->
+            <div id="step3Form" class="hidden">
+                <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Email address</label>
+                    <input type="email" id="confirmEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Create Password (for demo purposes)</label>
+                    <input type="password" id="password" minlength="6" required>
+                    <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                        For this demo system, create a password to secure your account.
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" minlength="6" required>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="marketingOptIn">
+                    <label for="marketingOptIn" style="font-weight: normal;">
+                        From time to time, we'll email you information about our products and services, 
+                        and those of third parties. If you'd rather we didn't, please tick this box.
+                    </label>
+                </div>
+                
+                <div id="registerAlert" class="alert"></div>
+                
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep(2)">Back</button>
+                    <button type="button" class="btn btn-primary" onclick="registerUser()">Complete Registration</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQ Section - UNCHANGED -->
+        <div class="faq-section">
+            <h3>Frequently asked questions</h3>
+            <ul class="faq-list">
+                <li>How to reset your memorable word and passcode</li>
+                <li>Is saving my details safe?</li>
+                <li>Service status</li>
+                <li>What does error code 6 mean?</li>
+                <li>How do I login with Mobile PINsentry?</li>
+            </ul>
+            <div style="margin-top: 20px;">
+                <a href="#" class="btn btn-link">Need more help?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Form - UNCHANGED -->
+    <div id="loginSection" class="container hidden">
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Log in to Online Banking</h1>
+                <p>Not registered for Online Banking? <a href="#" onclick="showRegistration()" style="color: var(--barclays-blue);">Register now</a></p>
+            </div>
+            
+            <!-- Login Options - UNCHANGED -->
+            <div class="login-options">
+                <button class="login-option active" onclick="showLoginMethod('membership')">Membership number</button>
+                <button class="login-option" onclick="showLoginMethod('card')">Card number</button>
+                <button class="login-option" onclick="showLoginMethod('sortcode')">Sort code and account number</button>
+            </div>
+            
+            <!-- Membership Number Login - UNCHANGED -->
+            <div id="membershipLogin" class="login-method">
+                <div class="form-group">
+                    <label>Last name</label>
+                    <input type="text" id="loginLastName">
+                </div>
+                
+                <div class="form-group">
+                    <label>Membership number (12 digits)</label>
+                    <input type="text" id="membershipNumber" minlength="12" maxlength="12" pattern="[0-9]{12}">
+                    <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                        <a href="#" style="color: var(--barclays-blue);">Don't know your membership number?</a>
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Password (for demo)</label>
+                    <input type="password" id="membershipPassword">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMembership">
+                    <label for="rememberMembership" style="font-weight: normal;">
+                        Remember my last name and login method (optional)<br>
+                        <small style="color: var(--barclays-gray);">Don't tick the box if you're using a public or shared device.</small>
+                    </label>
+                </div>
+                
+                <div id="loginAlert" class="alert"></div>
+                
+                <button type="button" class="btn btn-primary" onclick="loginWithMembership()">Continue</button>
+            </div>
+            
+            <!-- Card Number Login - UNCHANGED -->
+            <div id="cardLogin" class="login-method hidden">
+                <div class="form-group">
+                    <label>Last name</label>
+                    <input type="text" id="cardLastName">
+                </div>
+                
+                <div class="form-group">
+                    <label>Card number (16 digits)</label>
+                    <input type="text" id="loginCardNumber" minlength="16" maxlength="16" pattern="[0-9]{16}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Password (for demo)</label>
+                    <input type="password" id="cardPassword">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberCard">
+                    <label for="rememberCard" style="font-weight: normal;">
+                        Remember my last name and login method (optional)<br>
+                        <small style="color: var(--barclays-gray);">Don't tick the box if you're using a public or shared device.</small>
+                    </label>
+                </div>
+                
+                <button type="button" class="btn btn-primary" onclick="loginWithCard()">Continue</button>
+            </div>
+            
+            <!-- Sort Code Login - UNCHANGED -->
+            <div id="sortcodeLogin" class="login-method hidden">
+                <div class="form-group">
+                    <label>Last name</label>
+                    <input type="text" id="sortcodeLastName">
+                </div>
+                
+                <div class="form-group">
+                    <label>Sort code</label>
+                    <input type="text" id="loginSortCode" placeholder="20-00-00" pattern="[0-9]{2}-[0-9]{2}-[0-9]{2}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Account number</label>
+                    <input type="text" id="accountNumber" minlength="8" maxlength="8" pattern="[0-9]{8}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Password (for demo)</label>
+                    <input type="password" id="sortcodePassword">
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberSortcode">
+                    <label for="rememberSortcode" style="font-weight: normal;">
+                        Remember my last name and login method (optional)<br>
+                        <small style="color: var(--barclays-gray);">Don't tick the box if you're using a public or shared device.</small>
+                    </label>
+                </div>
+                
+                <button type="button" class="btn btn-primary" onclick="loginWithSortcode()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- FAQ Section - UNCHANGED -->
+        <div class="faq-section">
+            <h3>Frequently asked questions</h3>
+            <ul class="faq-list">
+                <li>How to reset your memorable word and passcode</li>
+                <li>Is saving my details safe?</li>
+                <li>Service status</li>
+                <li>What does error code 6 mean?</li>
+                <li>How do I login with Mobile PINsentry?</li>
+            </ul>
+            <div style="margin-top: 20px;">
+                <a href="#" class="btn btn-link">Need more help?</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Dashboard - UNCHANGED -->
+    <div id="dashboardSection" class="dashboard hidden">
+        <div class="dashboard-header">
+            <h1>Welcome, <span id="welcomeName"></span></h1>
+            <p>Account number: <span id="dashboardAccountNumber" class="account-number"></span></p>
+        </div>
+        
+        <!-- Account Details Card - UNCHANGED -->
+        <div class="account-details-card">
+            <h3 style="color: white; margin-bottom: 20px;">Account Details</h3>
+            <div class="account-details-row">
+                <span>Account Holder:</span>
+                <span id="accountHolderName"></span>
+            </div>
+            <div class="account-details-row">
+                <span>Account Number:</span>
+                <span id="fullAccountNumber"></span>
+            </div>
+            <div class="account-details-row">
+                <span>Sort Code:</span>
+                <span id="fullSortCode"></span>
+            </div>
+            <div class="account-details-row">
+                <span>IBAN:</span>
+                    <span id="ibanNumber"></span>
+                <button class="copy-btn" onclick="copyToClipboard('ibanNumber')">Copy</button>
+            </div>
+            <div class="account-details-row">
+                <span>SWIFT/BIC:</span>
+                <span id="swiftCode"></span>
+                <button class="copy-btn" onclick="copyToClipboard('swiftCode')">Copy</button>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="showAccountDetailsReceipt()">View Account Details Receipt</button>
+            </div>
+        </div>
+        
+        <div class="account-summary">
+            <div class="summary-card">
+                <h3>Available Balance</h3>
+                <div class="balance">£<span id="currentBalance">0.00</span></div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary btn-sm" onclick="showWithdrawModal()">Withdraw</button>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Account Type</h3>
+                <div id="accountTypeDisplay" style="font-size: 24px; font-weight: bold; color: var(--barclays-dark);"></div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Card Number</h3>
+                <div id="cardNumberDisplay" style="font-family: monospace; font-size: 18px; color: var(--barclays-dark);"></div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-secondary btn-sm" onclick="showTransferModal()">Make Transfer</button>
+                    <button class="btn btn-secondary btn-sm" onclick="requestATMCard()">Request ATM Card</button>
+                    <button class="btn btn-secondary btn-sm" onclick="showStatements()">View Statements</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ATM Card Request Section - UNCHANGED -->
+        <div class="atm-card-request">
+            <h3>🔒 ATM Card Services</h3>
+            <p>Need a new ATM card or have issues with your current card?</p>
+            <button class="btn btn-primary" onclick="requestATMCard()">Request ATM Card Support</button>
+        </div>
+        
+        <!-- Recent Transactions - UNCHANGED -->
+        <div class="summary-card" style="margin-top: 30px;">
+            <h3>Recent Transactions</h3>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionList">
+                    <!-- Transactions will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Admin Panel - MODIFIED FOR BALANCE ADDITION AND USER DELETION -->
+    <div id="adminSection" class="admin-panel hidden">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <div>
+                <button class="btn btn-secondary" onclick="showRegistration()">View Registration</button>
+                <button class="btn btn-danger" onclick="logoutAdmin()">Logout Admin</button>
+            </div>
+        </div>
+        
+        <!-- Admin Controls Panel - UNCHANGED -->
+        <div class="admin-controls-panel">
+            <h3>Admin Controls</h3>
+            <div class="admin-buttons">
+                <button class="btn btn-success" onclick="showCreateAccountModal()">➕ Create User Account</button>
+                <button class="btn btn-primary" onclick="refreshAdminUsers()">🔄 Refresh Users</button>
+                <button class="btn btn-warning" onclick="exportUsersToCSV()">📊 Export CSV</button>
+                <button class="btn btn-secondary" onclick="viewSystemLogs()">📋 View System Logs</button>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h2>All Registered Users <small>(Full Details)</small></h2>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Account Type</th>
+                        <th>Sort Code</th>
+                        <th>Card Number</th>
+                        <th>Account No.</th>
+                        <th>Balance</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="adminUsersList">
+                    <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Transfer Modal - UNCHANGED -->
+    <div id="transferModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Transfer Money</h3>
+            
+            <!-- Transfer Type Selection - UNCHANGED -->
+            <div class="transfer-options">
+                <div class="transfer-option-btn active" onclick="selectTransferType('domestic')" id="domesticTransferBtn">
+                    <h4>🇬🇧 Domestic</h4>
+                    <p>Within UK</p>
+                </div>
+                <div class="transfer-option-btn" onclick="selectTransferType('international')" id="internationalTransferBtn">
+                    <h4>🌍 International</h4>
+                    <p>Outside UK</p>
+                </div>
+            </div>
+            
+            <!-- Domestic Transfer Form - UNCHANGED -->
+            <div id="domesticTransferForm">
+                <div class="form-group">
+                    <label>Recipient Name</label>
+                    <input type="text" id="modalRecipientName" placeholder="Full name of recipient">
+                </div>
+                
+                <div class="form-group">
+                    <label>Recipient Sort Code</label>
+                    <input type="text" id="modalRecipientSortCode" placeholder="20-00-00" pattern="[0-9]{2}-[0-9]{2}-[0-9]{2}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Recipient Account Number</label>
+                    <input type="text" id="modalRecipientAccountNumber" minlength="8" maxlength="8" pattern="[0-9]{8}" placeholder="8-digit account number">
+                </div>
+                
+                <div class="form-group">
+                    <label>Amount (£)</label>
+                    <input type="number" id="modalTransferAmount" min="0.01" step="0.01" placeholder="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label>Reference (Optional)</label>
+                    <input type="text" id="modalTransferReference" placeholder="e.g., Rent payment">
+                </div>
+            </div>
+            
+            <!-- International Transfer Form - UNCHANGED -->
+            <div id="internationalTransferForm" class="hidden">
+                <div class="international-fields">
+                    <div class="form-group">
+                        <label>Recipient Full Name</label>
+                        <input type="text" id="intRecipientName" placeholder="As per bank account">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Recipient Bank Name</label>
+                        <input type="text" id="intBankName" placeholder="Recipient's bank name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Recipient Bank Address</label>
+                        <textarea id="intBankAddress" placeholder="Bank street address, city, country" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Recipient Account Number/IBAN</label>
+                        <input type="text" id="intAccountNumber" placeholder="Account number or IBAN">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>SWIFT/BIC Code</label>
+                        <input type="text" id="intSwiftCode" placeholder="11-character SWIFT code">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Amount (£)</label>
+                        <input type="number" id="intTransferAmount" min="0.01" step="0.01" placeholder="0.00">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Transfer Reason</label>
+                        <select id="transferReason">
+                            <option value="">Select reason</option>
+                            <option value="family">Family Support</option>
+                            <option value="education">Education Fees</option>
+                            <option value="property">Property Purchase</option>
+                            <option value="investment">Investment</option>
+                            <option value="business">Business Payment</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Additional Reference</label>
+                        <textarea id="intReference" placeholder="Additional details for compliance" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="modalTransferAlert" class="alert" style="display: none;"></div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="processModalTransfer()">Continue Transfer</button>
+                <button class="btn btn-secondary" onclick="hideModal('transferModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Modal - UNCHANGED -->
+    <div id="withdrawModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Withdraw Money</h3>
+            <div class="form-group">
+                <label>Amount (£)</label>
+                <input type="number" id="withdrawAmount" min="0.01" step="0.01" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label>Description (Optional)</label>
+                <input type="text" id="withdrawDescription" placeholder="e.g., Cash withdrawal">
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="processWithdrawal()">Withdraw</button>
+                <button class="btn btn-secondary" onclick="hideModal('withdrawModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal - UNCHANGED -->
+    <div id="receiptModal" class="modal-overlay hidden">
+        <div class="modal" style="max-width: 700px;">
+            <div class="bank-receipt" id="receiptContent">
+                <!-- Receipt content will be generated here -->
+            </div>
+            <div class="button-group" style="margin-top: 30px; justify-content: center;">
+                <button class="print-btn" onclick="printReceipt()">🖨️ Print Receipt</button>
+                <button class="btn btn-primary" onclick="downloadReceipt()">📥 Download Receipt</button>
+                <button class="btn btn-secondary" onclick="closeReceipt()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Create Account Modal - UNCHANGED -->
+    <div id="createAccountModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Create User Account (Admin)</h3>
+            <div class="info-text">
+                Create a new bank account for a customer. An email will be automatically sent to the customer with their account details.
+            </div>
+            
+            <div class="form-group">
+                <label>Customer Last Name *</label>
+                <input type="text" id="adminLastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Customer Email Address *</label>
+                <input type="email" id="adminEmail" required>
+                <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                    Account creation email will be sent to this address
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label>Date of Birth (DD/MM/YYYY) *</label>
+                <div class="date-inputs">
+                    <input type="number" id="adminBirthDay" placeholder="DD" min="1" max="31" required>
+                    <input type="number" id="adminBirthMonth" placeholder="MM" min="1" max="12" required>
+                    <input type="number" id="adminBirthYear" placeholder="YYYY" min="1900" max="2025" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Postcode *</label>
+                <input type="text" id="adminPostcode" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Account Type *</label>
+                <select id="adminAccountType" required>
+                    <option value="">Select account type</option>
+                    <option value="current">Current Account</option>
+                    <option value="savings">Savings Account</option>
+                    <option value="business">Business Account</option>
+                    <option value="premium">Premium Account</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Initial Deposit Amount (£)</label>
+                <input type="number" id="adminInitialDeposit" min="0" step="0.01" value="0" required>
+                <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                    New accounts start with £0.00 balance
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label>Temporary Password *</label>
+                <input type="text" id="adminTempPassword" value="Welcome123" required>
+                <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                    Customer will use this password for first login (they should change it)
+                </small>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="adminSendWelcomeEmail" checked>
+                <label for="adminSendWelcomeEmail" style="font-weight: normal;">
+                    Send welcome email with account details to customer
+                </label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="adminGenerateCard">
+                <label for="adminGenerateCard" style="font-weight: normal;">
+                    Generate virtual debit card details
+                </label>
+            </div>
+            
+            <div id="adminCreateAlert" class="alert" style="display: none;"></div>
+            
+            <!-- Email Preview - UNCHANGED -->
+            <div id="emailPreview" class="email-preview hidden">
+                <div class="email-header">
+                    <h4>Email Preview</h4>
+                </div>
+                <div class="email-content" id="emailContent">
+                    <!-- Email content will be generated here -->
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-success" onclick="previewCustomerEmail()">📧 Preview Email</button>
+                <button class="btn btn-primary" onclick="createUserAccount()">Create Account</button>
+                <button class="btn btn-secondary" onclick="hideModal('createAccountModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Transaction Editor Modal - UNCHANGED -->
+    <div id="transactionEditorModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h3>Transaction Management</h3>
+            <p>User: <strong id="editorUserName"></strong></p>
+            <p>Account: <strong id="editorAccountNumber"></strong></p>
+            <p>Current Balance: <strong>£<span id="editorCurrentBalance"></span></strong></p>
+            
+            <div class="transaction-editor">
+                <h4>Add/Edit Transaction</h4>
+                
+                <div class="form-group">
+                    <label>Transaction Type</label>
+                    <select id="editorTransType">
+                        <option value="credit">Credit (Deposit)</option>
+                        <option value="debit">Debit (Withdrawal)</option>
+                        <option value="transfer_in">Transfer In</option>
+                        <option value="transfer_out">Transfer Out</option>
+                        <option value="fee">Bank Fee</option>
+                        <option value="interest">Interest Payment</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Amount (£)</label>
+                    <input type="number" id="editorAmount" min="0.01" step="0.01" placeholder="0.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editorDescription" placeholder="Transaction description" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Transaction Date</label>
+                    <input type="date" id="editorTransDate" required>
+                    <small style="color: var(--barclays-gray); margin-top: 5px; display: block;">
+                        You can backdate transactions by selecting past dates
+                    </small>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="editorNotifyUser" checked>
+                    <label for="editorNotifyUser" style="font-weight: normal;">
+                        Send transaction notification email to user
+                    </label>
+                </div>
+                
+                <div id="editorAlert" class="alert" style="display: none;"></div>
+                
+                <div class="button-group">
+                    <button class="btn btn-success" onclick="addTransaction()">Add Transaction</button>
+                    <button class="btn btn-secondary" onclick="hideModal('transactionEditorModal')">Cancel</button>
+                </div>
+            </div>
+            
+            <div class="transaction-editor">
+                <h4>Existing Transactions</h4>
+                <div class="transaction-list" id="transactionListContainer">
+                    <!-- Transactions will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer - UNCHANGED -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Service status</a>
+                <a href="#">Contact us</a>
+                <a href="#">Security</a>
+                <a href="#">Accessibility</a>
+                <a href="#">See our cookies policy</a>
+            </div>
+            
+            <div class="footer-disclaimer">
+                <p>Barclays Bank UK PLC. Authorised by the Prudential Regulation Authority and regulated by the Financial Conduct Authority and the Prudential Regulation Authority (Financial Services Register number: 759676).</p>
+                <p>Barclays Bank PLC. Authorised by the Prudential Regulation Authority and regulated by the Financial Conduct Authority and the Prudential Regulation Authority (Financial Services Register number: 122702).</p>
+                <p>Barclays Bank UK PLC. Registered no. 9740322. Barclays Bank PLC. Registered no. 1026167. All registered in England. Registered office for all: 1 Churchill Place, London E14 5HP.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase and App Logic -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD6RIYTsP-F3UhKR5Zuu6F-ok1RTHShEQs",
+            authDomain: "barclays-cc823.firebaseapp.com",
+            projectId: "barclays-cc823",
+            storageBucket: "barclays-cc823.firebasestorage.app",
+            messagingSenderId: "770942938167",
+            appId: "1:770942938167:web:1cde1cbfd35bd4084e63b2",
+            measurementId: "G-BZ8YJ3YQ93"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Global variables
+        let currentUser = null;
+        let currentUserData = null;
+        const ADMIN_EMAIL = 'admin@barclaysdemo.com';
+        let currentTransferType = 'domestic';
+        let editingUserId = null;
+        let currentReceiptData = null;
+
+        // Page Navigation
+        function showRegistration() {
+            document.getElementById('registrationSection').classList.remove('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            resetRegistrationForm();
+        }
+
+        function showLogin() {
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('adminLoginBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            
+            clearLoginForm();
+        }
+
+        function clearLoginForm() {
+            document.getElementById('loginLastName').value = '';
+            document.getElementById('membershipNumber').value = '';
+            document.getElementById('membershipPassword').value = '';
+            
+            document.getElementById('cardLastName').value = '';
+            document.getElementById('loginCardNumber').value = '';
+            document.getElementById('cardPassword').value = '';
+            
+            document.getElementById('sortcodeLastName').value = '';
+            document.getElementById('loginSortCode').value = '';
+            document.getElementById('accountNumber').value = '';
+            document.getElementById('sortcodePassword').value = '';
+            
+            document.getElementById('loginAlert').style.display = 'none';
+            
+            showLoginMethod('membership');
+        }
+
+        function showHomePage() {
+            if (currentUser) {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showAdminLogin() {
+            const email = prompt('Enter admin email:');
+            const password = prompt('Enter admin password:');
+            
+            if (email === ADMIN_EMAIL && password === 'admin123') {
+                showAdminPanel();
+            } else {
+                alert('Invalid admin credentials');
+            }
+        }
+
+        // Registration Form Steps
+        function nextStep(step) {
+            if (step === 2) {
+                if (!validateStep1()) return;
+            } else if (step === 3) {
+                if (!validateStep2()) return;
+            }
+            
+            document.getElementById('step1Form').classList.add('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
+            document.getElementById('step3Form').classList.add('hidden');
+            
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+            
+            document.getElementById('step' + step + 'Form').classList.remove('hidden');
+            document.getElementById('step' + step).classList.add('active');
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        function validateStep1() {
+            const lastName = document.getElementById('lastName').value;
+            const day = document.getElementById('birthDay').value;
+            const month = document.getElementById('birthMonth').value;
+            const year = document.getElementById('birthYear').value;
+            const postcode = document.getElementById('postcode').value;
+            
+            if (!lastName || !day || !month || !year || !postcode) {
+                alert('Please fill in all required fields');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function validateStep2() {
+            const sortCode = document.getElementById('sortCode').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            
+            if (!sortCode || !cardNumber) {
+                alert('Please fill in all required fields');
+                return false;
+            }
+            
+            if (!/^\d{2}-\d{2}-\d{2}$/.test(sortCode)) {
+                alert('Please enter a valid sort code (format: 20-00-00)');
+                return false;
+            }
+            
+            if (!/^\d{16}$/.test(cardNumber)) {
+                alert('Please enter a valid 16-digit card number');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function cancelRegistration() {
+            if (confirm('Are you sure you want to cancel registration?')) {
+                showLogin();
+            }
+        }
+
+        // User Registration
+        async function registerUser() {
+            const lastName = document.getElementById('lastName').value;
+            const day = document.getElementById('birthDay').value;
+            const month = document.getElementById('birthMonth').value;
+            const year = document.getElementById('birthYear').value;
+            const postcode = document.getElementById('postcode').value;
+            const accountType = document.querySelector('input[name="accountType"]:checked').value;
+            const sortCode = document.getElementById('sortCode').value;
+            const cardNumber = document.getElementById('cardNumber').value;
+            const email = document.getElementById('email').value;
+            const confirmEmail = document.getElementById('confirmEmail').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const marketingOptIn = document.getElementById('marketingOptIn').checked;
+            
+            if (email !== confirmEmail) {
+                showAlert('registerAlert', 'Email addresses do not match', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert('registerAlert', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('registerAlert', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Generate account details - START WITH 0.00 BALANCE
+                const accountData = generateAccountDetails(accountType, lastName);
+                accountData.balance = 0.00; // Force 0.00 balance for new accounts
+                
+                await db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    lastName: lastName,
+                    dateOfBirth: `${day}/${month}/${year}`,
+                    postcode: postcode,
+                    email: email,
+                    accountType: accountType,
+                    sortCode: sortCode,
+                    cardNumber: cardNumber,
+                    accountNumber: accountData.accountNumber,
+                    membershipNumber: accountData.membershipNumber,
+                    iban: accountData.iban,
+                    swift: accountData.swift,
+                    balance: 0.00, // Always start with 0.00
+                    marketingOptIn: marketingOptIn,
+                    isAdmin: email === ADMIN_EMAIL,
+                    createdBy: 'self',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    transactions: [
+                        {
+                            date: new Date().toISOString(),
+                            description: 'Account Opening',
+                            amount: 0.00,
+                            balance: 0.00,
+                            type: 'credit',
+                            reference: 'ACCOUNT_OPENING',
+                            processedBy: 'system'
+                        }
+                    ]
+                });
+                
+                // Log admin activity
+                await logAdminActivity('USER_SELF_REGISTER', {
+                    userId: user.uid,
+                    email: email,
+                    accountNumber: accountData.accountNumber
+                });
+                
+                showAlert('registerAlert', 'Registration successful! Loading your dashboard...', 'success');
+                
+                resetRegistrationForm();
+                
+            } catch (error) {
+                showAlert('registerAlert', error.message, 'error');
+            }
+        }
+
+        // Login Methods
+        function showLoginMethod(method) {
+            document.querySelectorAll('.login-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.getElementById('membershipLogin').classList.add('hidden');
+            document.getElementById('cardLogin').classList.add('hidden');
+            document.getElementById('sortcodeLogin').classList.add('hidden');
+            
+            document.getElementById(method + 'Login').classList.remove('hidden');
+        }
+
+        async function loginWithMembership() {
+            const lastName = document.getElementById('loginLastName').value;
+            const membershipNumber = document.getElementById('membershipNumber').value;
+            const password = document.getElementById('membershipPassword').value;
+            
+            if (!lastName || !membershipNumber || !password) {
+                showAlert('loginAlert', 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (!/^\d{12}$/.test(membershipNumber)) {
+                showAlert('loginAlert', 'Please enter a valid 12-digit membership number', 'error');
+                return;
+            }
+            
+            try {
+                const usersSnapshot = await db.collection('users')
+                    .where('membershipNumber', '==', membershipNumber)
+                    .where('lastName', '==', lastName)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    showAlert('loginAlert', 'Invalid membership number or last name', 'error');
+                    return;
+                }
+                
+                const userDoc = usersSnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                await auth.signInWithEmailAndPassword(userData.email, password);
+                
+            } catch (error) {
+                showAlert('loginAlert', error.message, 'error');
+            }
+        }
+
+        async function loginWithCard() {
+            const lastName = document.getElementById('cardLastName').value;
+            const cardNumber = document.getElementById('loginCardNumber').value;
+            const password = document.getElementById('cardPassword').value;
+            
+            if (!lastName || !cardNumber || !password) {
+                showAlert('loginAlert', 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (!/^\d{16}$/.test(cardNumber)) {
+                showAlert('loginAlert', 'Please enter a valid 16-digit card number', 'error');
+                return;
+            }
+            
+            try {
+                const usersSnapshot = await db.collection('users')
+                    .where('cardNumber', '==', cardNumber)
+                    .where('lastName', '==', lastName)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    showAlert('loginAlert', 'Invalid card number or last name', 'error');
+                    return;
+                }
+                
+                const userDoc = usersSnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                await auth.signInWithEmailAndPassword(userData.email, password);
+                
+            } catch (error) {
+                showAlert('loginAlert', error.message, 'error');
+            }
+        }
+
+        async function loginWithSortcode() {
+            const lastName = document.getElementById('sortcodeLastName').value;
+            const sortCode = document.getElementById('loginSortCode').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const password = document.getElementById('sortcodePassword').value;
+            
+            if (!lastName || !sortCode || !accountNumber || !password) {
+                showAlert('loginAlert', 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (!/^\d{2}-\d{2}-\d{2}$/.test(sortCode)) {
+                showAlert('loginAlert', 'Please enter a valid sort code (format: 20-00-00)', 'error');
+                return;
+            }
+            
+            if (!/^\d{8}$/.test(accountNumber)) {
+                showAlert('loginAlert', 'Please enter a valid 8-digit account number', 'error');
+                return;
+            }
+            
+            try {
+                const usersSnapshot = await db.collection('users')
+                    .where('sortCode', '==', sortCode)
+                    .where('accountNumber', '==', accountNumber)
+                    .where('lastName', '==', lastName)
+                    .get();
+                
+                if (usersSnapshot.empty) {
+                    showAlert('loginAlert', 'Invalid account details', 'error');
+                    return;
+                }
+                
+                const userDoc = usersSnapshot.docs[0];
+                const userData = userDoc.data();
+                
+                await auth.signInWithEmailAndPassword(userData.email, password);
+                
+            } catch (error) {
+                showAlert('loginAlert', error.message, 'error');
+            }
+        }
+
+        // Dashboard Functions
+        async function showDashboard() {
+            if (!currentUserData) return;
+            
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.remove('hidden');
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('adminLoginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            // Update dashboard data
+            document.getElementById('welcomeName').textContent = currentUserData.lastName;
+            document.getElementById('dashboardAccountNumber').textContent = currentUserData.accountNumber;
+            document.getElementById('currentBalance').textContent = currentUserData.balance.toFixed(2);
+            document.getElementById('accountTypeDisplay').textContent = currentUserData.accountType.charAt(0).toUpperCase() + currentUserData.accountType.slice(1);
+            document.getElementById('cardNumberDisplay').textContent = currentUserData.cardNumber;
+            
+            // Update account details card
+            document.getElementById('accountHolderName').textContent = currentUserData.lastName;
+            document.getElementById('fullAccountNumber').textContent = currentUserData.accountNumber;
+            document.getElementById('fullSortCode').textContent = currentUserData.sortCode;
+            document.getElementById('ibanNumber').textContent = currentUserData.iban || 'GB29BARC' + Math.floor(10000000000000 + Math.random() * 90000000000000).toString();
+            document.getElementById('swiftCode').textContent = currentUserData.swift || 'BARCGB22';
+            
+            loadTransactions();
+        }
+
+        async function loadTransactions() {
+            if (!currentUserData) return;
+            
+            const transactionList = document.getElementById('transactionList');
+            transactionList.innerHTML = '';
+            
+            if (currentUserData.transactions && currentUserData.transactions.length > 0) {
+                // Sort transactions by date (newest first)
+                const sortedTransactions = [...currentUserData.transactions].sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                sortedTransactions.forEach(trans => {
+                    const row = `
+                        <tr>
+                            <td>${new Date(trans.date).toLocaleDateString()}</td>
+                            <td>${trans.description}${trans.reference ? ` (${trans.reference})` : ''}</td>
+                            <td style="color: ${trans.type === 'credit' || trans.type === 'transfer_in' || trans.type === 'interest' ? 'green' : 'red'}">
+                                ${trans.type === 'credit' || trans.type === 'transfer_in' || trans.type === 'interest' ? '+' : '-'}£${Math.abs(trans.amount).toFixed(2)}
+                            </td>
+                            <td>£${trans.balance.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    transactionList.innerHTML += row;
+                });
+            } else {
+                transactionList.innerHTML = '<tr><td colspan="4">No transactions found</td></tr>';
+            }
+        }
+
+        // Generate Account Details Function
+        function generateAccountDetails(accountType, lastName) {
+            const accountNumber = '20' + Math.floor(100000 + Math.random() * 900000);
+            const membershipNumber = Math.floor(100000000000 + Math.random() * 900000000000).toString();
+            const iban = 'GB29BARC' + Math.floor(10000000000000 + Math.random() * 90000000000000).toString();
+            const swift = 'BARCGB22';
+            
+            // Always start with 0.00 balance for new accounts
+            const balance = 0.00;
+            
+            return {
+                accountNumber,
+                membershipNumber,
+                iban,
+                swift,
+                balance
+            };
+        }
+
+        // Admin Functions
+        async function showAdminPanel() {
+            document.getElementById('registrationSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('dashboardSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.remove('hidden');
+            document.getElementById('adminLoginBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            await loadAllUsers();
+        }
+
+        // Show Create Account Modal
+        function showCreateAccountModal() {
+            document.getElementById('createAccountModal').classList.remove('hidden');
+            document.getElementById('adminCreateAlert').style.display = 'none';
+            document.getElementById('emailPreview').classList.add('hidden');
+            
+            // Set default values
+            document.getElementById('adminLastName').value = '';
+            document.getElementById('adminEmail').value = '';
+            document.getElementById('adminBirthDay').value = '';
+            document.getElementById('adminBirthMonth').value = '';
+            document.getElementById('adminBirthYear').value = '';
+            document.getElementById('adminPostcode').value = '';
+            document.getElementById('adminAccountType').value = '';
+            document.getElementById('adminInitialDeposit').value = '0'; // Start with 0
+            document.getElementById('adminTempPassword').value = 'Welcome123';
+            document.getElementById('adminSendWelcomeEmail').checked = true;
+            document.getElementById('adminGenerateCard').checked = true;
+        }
+
+        // Preview Customer Email
+        function previewCustomerEmail() {
+            const lastName = document.getElementById('adminLastName').value;
+            const email = document.getElementById('adminEmail').value;
+            const accountType = document.getElementById('adminAccountType').value;
+            const initialDeposit = document.getElementById('adminInitialDeposit').value;
+            
+            if (!lastName || !email || !accountType) {
+                alert('Please fill in required fields first');
+                return;
+            }
+            
+            // Generate sample account details for preview
+            const accountData = generateAccountDetails(accountType, lastName);
+            
+            const emailContent = `
+                <p><strong>Subject:</strong> Welcome to Barclays - Your New Account Details</p>
+                <hr>
+                <p>Dear ${lastName},</p>
+                <p>Welcome to Barclays! Your new ${accountType} account has been successfully created.</p>
+                <p>Here are your account details:</p>
+                <ul>
+                    <li><strong>Account Holder:</strong> ${lastName}</li>
+                    <li><strong>Account Number:</strong> ${accountData.accountNumber}</li>
+                    <li><strong>Sort Code:</strong> 20-00-00</li>
+                    <li><strong>Account Type:</strong> ${accountType.charAt(0).toUpperCase() + accountType.slice(1)} Account</li>
+                    <li><strong>Initial Balance:</strong> £0.00</li>
+                    <li><strong>Temporary Password:</strong> ${document.getElementById('adminTempPassword').value}</li>
+                </ul>
+                <p><strong>Important:</strong> For security reasons, please change your password on first login.</p>
+                <p>You can access your account at: <a href="#">https://onlinebanking.barclays.co.uk</a></p>
+                <p>If you have any questions, please contact our customer service at 0800 123 4567.</p>
+                <p>Best regards,<br>Barclays Bank</p>
+            `;
+            
+            document.getElementById('emailContent').innerHTML = emailContent;
+            document.getElementById('emailPreview').classList.remove('hidden');
+        }
+
+        // Create User Account (Admin)
+        async function createUserAccount() {
+            const lastName = document.getElementById('adminLastName').value;
+            const email = document.getElementById('adminEmail').value;
+            const day = document.getElementById('adminBirthDay').value;
+            const month = document.getElementById('adminBirthMonth').value;
+            const year = document.getElementById('adminBirthYear').value;
+            const postcode = document.getElementById('adminPostcode').value;
+            const accountType = document.getElementById('adminAccountType').value;
+            const initialDeposit = parseFloat(document.getElementById('adminInitialDeposit').value);
+            const tempPassword = document.getElementById('adminTempPassword').value;
+            const sendWelcomeEmail = document.getElementById('adminSendWelcomeEmail').checked;
+            const generateCard = document.getElementById('adminGenerateCard').checked;
+            
+            // Validation
+            if (!lastName || !email || !day || !month || !year || !postcode || !accountType || !tempPassword) {
+                showAlert('adminCreateAlert', 'Please fill in all required fields', 'error');
+                return;
+            }
+            
+            if (tempPassword.length < 6) {
+                showAlert('adminCreateAlert', 'Temporary password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                // Create Firebase Auth user
+                const userCredential = await auth.createUserWithEmailAndPassword(email, tempPassword);
+                const user = userCredential.user;
+                
+                // Generate account details - START WITH 0.00 BALANCE
+                const accountData = generateAccountDetails(accountType, lastName);
+                accountData.balance = 0.00; // Force 0.00 balance
+                
+                // Generate card number if requested
+                const cardNumber = generateCard ? Math.floor(1000000000000000 + Math.random() * 9000000000000000).toString() : 'PENDING';
+                const sortCode = generateCard ? '20-00-00' : 'PENDING';
+                
+                // Create user document
+                await db.collection('users').doc(user.uid).set({
+                    uid: user.uid,
+                    lastName: lastName,
+                    dateOfBirth: `${day}/${month}/${year}`,
+                    postcode: postcode,
+                    email: email,
+                    accountType: accountType,
+                    sortCode: sortCode,
+                    cardNumber: cardNumber,
+                    accountNumber: accountData.accountNumber,
+                    membershipNumber: accountData.membershipNumber,
+                    iban: accountData.iban,
+                    swift: accountData.swift,
+                    balance: 0.00, // Always start with 0.00
+                    marketingOptIn: false,
+                    isAdmin: false,
+                    createdBy: 'admin',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    transactions: [
+                        {
+                            date: new Date().toISOString(),
+                            description: 'Account Opening',
+                            amount: 0.00,
+                            balance: 0.00,
+                            type: 'credit',
+                            reference: 'ADMIN_CREATED',
+                            processedBy: 'admin'
+                        }
+                    ],
+                    requiresPasswordChange: true
+                });
+                
+                // Log admin activity
+                await logAdminActivity('ACCOUNT_CREATED', {
+                    userId: user.uid,
+                    userEmail: email,
+                    accountNumber: accountData.accountNumber,
+                    accountType: accountType
+                });
+                
+                // Send welcome email if requested
+                if (sendWelcomeEmail) {
+                    await sendWelcomeEmailToUser({
+                        email: email,
+                        lastName: lastName,
+                        accountNumber: accountData.accountNumber,
+                        accountType: accountType,
+                        sortCode: sortCode,
+                        cardNumber: cardNumber,
+                        iban: accountData.iban,
+                        swift: accountData.swift
+                    });
+                }
+                
+                showAlert('adminCreateAlert', `Account created successfully for ${lastName}! ${sendWelcomeEmail ? 'Welcome email sent.' : ''}`, 'success');
+                
+                // Refresh user list
+                await loadAllUsers();
+                
+                // Clear form after 2 seconds
+                setTimeout(() => {
+                    hideModal('createAccountModal');
+                }, 2000);
+                
+            } catch (error) {
+                showAlert('adminCreateAlert', 'Error creating account: ' + error.message, 'error');
+            }
+        }
+
+        // Send Welcome Email (Simulated)
+        async function sendWelcomeEmailToUser(userData) {
+            // In a real app, you would use a backend service like SendGrid, Mailgun, etc.
+            // For demo purposes, we'll log it and show a success message
+            
+            const emailLog = {
+                to: userData.email,
+                subject: `Welcome to Barclays - Your New ${userData.accountType} Account`,
+                body: `
+Dear ${userData.lastName},
+
+Welcome to Barclays! Your new account has been successfully created.
+
+Account Details:
+- Account Holder: ${userData.lastName}
+- Account Number: ${userData.accountNumber}
+- Sort Code: ${userData.sortCode}
+- Account Type: ${userData.accountType}
+- Initial Balance: £0.00
+- Temporary Password: ${userData.tempPassword}
+${userData.cardNumber !== 'PENDING' ? `- Debit Card: **** **** **** ${userData.cardNumber.slice(-4)}` : ''}
+- IBAN: ${userData.iban}
+- SWIFT/BIC: ${userData.swift}
+
+Important Security Notes:
+1. Please change your password on first login
+2. Keep your account details secure
+3. Never share your password with anyone
+
+You can access your account at: https://onlinebanking.barclays.co.uk
+
+If you have any questions, please contact us at 0800 123 4567.
+
+Best regards,
+Barclays Bank
+                `,
+                sentAt: new Date().toISOString(),
+                sentBy: 'system'
+            };
+            
+            // Save email log to Firestore
+            await db.collection('email_logs').add(emailLog);
+            
+            // Log admin activity
+            await logAdminActivity('WELCOME_EMAIL_SENT', {
+                recipientEmail: userData.email,
+                accountNumber: userData.accountNumber
+            });
+            
+            console.log('Welcome email sent to:', userData.email);
+            return true;
+        }
+
+        // Load All Users for Admin
+        async function loadAllUsers() {
+            try {
+                const usersSnapshot = await db.collection('users').get();
+                const usersList = document.getElementById('adminUsersList');
+                usersList.innerHTML = '';
+                
+                usersSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    const currentBalance = user.balance?.toFixed(2) || '0.00';
+                    const row = `
+                        <tr>
+                            <td>${user.lastName}</td>
+                            <td>${user.email}</td>
+                            <td>${user.accountType || 'N/A'}</td>
+                            <td>${user.sortCode || 'N/A'}</td>
+                            <td>${user.cardNumber || 'N/A'}</td>
+                            <td>${user.accountNumber || 'N/A'}</td>
+                            <td>
+                                <div style="font-weight: bold; font-size: 18px; margin-bottom: 10px;">£${currentBalance}</div>
+                                <div class="balance-edit">
+                                    <input type="number" id="editBalance_${doc.id}" value="${currentBalance}" placeholder="Set exact balance" step="0.01" min="0">
+                                    <button class="btn btn-sm btn-success" onclick="updateUserBalance('${doc.id}')">Update Balance</button>
+                                </div>
+                                <div style="margin-top: 5px; font-size: 12px; color: var(--barclays-gray);">
+                                    <button class="btn btn-sm btn-link" onclick="quickAddBalance('${doc.id}', 100)">+£100</button>
+                                    <button class="btn btn-sm btn-link" onclick="quickAddBalance('${doc.id}', 500)">+£500</button>
+                                    <button class="btn btn-sm btn-link" onclick="quickAddBalance('${doc.id}', 1000)">+£1000</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="transaction-actions">
+                                    <button class="btn btn-sm btn-primary" onclick="manageUserTransactions('${doc.id}')">💳 Transactions</button>
+                                    <button class="btn btn-sm btn-success" onclick="addBalanceToUser('${doc.id}')">💰 Add Balance</button>
+                                    <button class="btn btn-sm btn-warning" onclick="viewUserDetails('${doc.id}')">👁️ View</button>
+                                    ${user.isAdmin ? '<span class="btn btn-sm btn-secondary">Admin</span>' : ''}
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteUser('${doc.id}', '${user.email}')">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    usersList.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Quick Add Balance Helper
+        async function quickAddBalance(userId, amount) {
+            if (!confirm(`Add £${amount} to this user's balance?`)) {
+                return;
+            }
+            
+            try {
+                // Get current user data
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                const oldBalance = userData.balance;
+                const newBalance = oldBalance + amount;
+                
+                // Create deposit transaction
+                const transaction = {
+                    date: new Date().toISOString(),
+                    description: 'Quick Balance Addition',
+                    amount: amount,
+                    balance: newBalance,
+                    type: 'credit',
+                    reference: 'QUICK_DEPOSIT',
+                    processedBy: 'admin',
+                    processedAt: new Date().toISOString()
+                };
+                
+                // Update user document
+                await db.collection('users').doc(userId).update({
+                    balance: newBalance,
+                    transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                });
+                
+                // Log admin activity
+                await logAdminActivity('QUICK_BALANCE_ADDED', {
+                    userId: userId,
+                    userEmail: userData.email,
+                    addedAmount: amount,
+                    oldBalance: oldBalance,
+                    newBalance: newBalance
+                });
+                
+                // Update the input field with new balance
+                document.getElementById(`editBalance_${userId}`).value = newBalance.toFixed(2);
+                
+                alert(`Successfully added £${amount.toFixed(2)}! New balance: £${newBalance.toFixed(2)}`);
+                await loadAllUsers();
+                
+            } catch (error) {
+                alert('Error adding balance: ' + error.message);
+            }
+        }
+
+        // Add Balance to User
+        async function addBalanceToUser(userId) {
+            const amount = prompt('Enter amount to add to user balance:');
+            
+            if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+                alert('Please enter a valid positive amount');
+                return;
+            }
+            
+            const addAmount = parseFloat(amount);
+            
+            if (!confirm(`Are you sure you want to add £${addAmount.toFixed(2)} to this user's balance?`)) {
+                return;
+            }
+            
+            try {
+                // Get current user data
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                const oldBalance = userData.balance;
+                const newBalance = oldBalance + addAmount;
+                
+                // Create deposit transaction
+                const transaction = {
+                    date: new Date().toISOString(),
+                    description: 'Admin Balance Addition',
+                    amount: addAmount,
+                    balance: newBalance,
+                    type: 'credit',
+                    reference: 'ADMIN_DEPOSIT',
+                    processedBy: 'admin',
+                    processedAt: new Date().toISOString()
+                };
+                
+                // Update user document
+                await db.collection('users').doc(userId).update({
+                    balance: newBalance,
+                    transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                });
+                
+                // Log admin activity
+                await logAdminActivity('BALANCE_ADDED', {
+                    userId: userId,
+                    userEmail: userData.email,
+                    addedAmount: addAmount,
+                    oldBalance: oldBalance,
+                    newBalance: newBalance
+                });
+                
+                // Update the input field with new balance
+                document.getElementById(`editBalance_${userId}`).value = newBalance.toFixed(2);
+                
+                alert(`Successfully added £${addAmount.toFixed(2)} to user's balance! New balance: £${newBalance.toFixed(2)}`);
+                await loadAllUsers();
+                
+            } catch (error) {
+                alert('Error adding balance: ' + error.message);
+            }
+        }
+
+        // Confirm Delete User
+        async function confirmDeleteUser(userId, userEmail) {
+            if (!confirm(`⚠️ WARNING: Are you sure you want to delete user ${userEmail}?\n\nThis action will:\n1. Delete all user data\n2. Delete all transactions\n3. Cannot be undone!\n\nType "DELETE" to confirm:`)) {
+                return;
+            }
+            
+            const confirmation = prompt('Please type "DELETE" to confirm deletion:');
+            
+            if (confirmation !== 'DELETE') {
+                alert('Deletion cancelled. User was NOT deleted.');
+                return;
+            }
+            
+            // Check if user is trying to delete themselves
+            if (userId === currentUser?.uid) {
+                alert('You cannot delete your own admin account!');
+                return;
+            }
+            
+            await deleteUserAccount(userId);
+        }
+
+        // Delete User Account
+        async function deleteUserAccount(userId) {
+            try {
+                // Get user data before deletion for logging
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                
+                // Log admin activity BEFORE deletion
+                await logAdminActivity('USER_DELETED', {
+                    deletedUserId: userId,
+                    deletedUserEmail: userData.email,
+                    deletedUserName: userData.lastName,
+                    deletedAccountNumber: userData.accountNumber,
+                    deletedBalance: userData.balance,
+                    deletionTime: new Date().toISOString()
+                });
+                
+                // Delete user document from Firestore
+                await db.collection('users').doc(userId).delete();
+                
+                // Also delete associated email logs
+                const emailLogs = await db.collection('email_logs')
+                    .where('to', '==', userData.email)
+                    .get();
+                
+                const deletePromises = [];
+                emailLogs.forEach(doc => {
+                    deletePromises.push(db.collection('email_logs').doc(doc.id).delete());
+                });
+                
+                await Promise.all(deletePromises);
+                
+                alert(`User ${userData.email} has been successfully deleted from the system.`);
+                
+                // Refresh user list
+                await loadAllUsers();
+                
+            } catch (error) {
+                alert('Error deleting user: ' + error.message);
+            }
+        }
+
+        // Manage User Transactions
+        async function manageUserTransactions(userId) {
+            editingUserId = userId;
+            
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                
+                // Update modal info
+                document.getElementById('editorUserName').textContent = userData.lastName;
+                document.getElementById('editorAccountNumber').textContent = userData.accountNumber;
+                document.getElementById('editorCurrentBalance').textContent = userData.balance.toFixed(2);
+                
+                // Set default date to today
+                document.getElementById('editorTransDate').valueAsDate = new Date();
+                
+                // Load existing transactions
+                await loadUserTransactions(userId);
+                
+                // Show modal
+                document.getElementById('transactionEditorModal').classList.remove('hidden');
+                
+            } catch (error) {
+                alert('Error loading user data: ' + error.message);
+            }
+        }
+
+        // Load User Transactions for Editing
+        async function loadUserTransactions(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                const transactions = userData.transactions || [];
+                
+                const container = document.getElementById('transactionListContainer');
+                container.innerHTML = '';
+                
+                if (transactions.length === 0) {
+                    container.innerHTML = '<p>No transactions found</p>';
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                const sortedTransactions = [...transactions].sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                sortedTransactions.forEach((trans, index) => {
+                    const transItem = document.createElement('div');
+                    transItem.className = 'transaction-item';
+                    transItem.innerHTML = `
+                        <div>
+                            <strong>${new Date(trans.date).toLocaleDateString()}</strong><br>
+                            ${trans.description}<br>
+                            <small>Type: ${trans.type} | Ref: ${trans.reference || 'N/A'}</small>
+                        </div>
+                        <div>
+                            <span style="color: ${trans.type === 'credit' || trans.type === 'transfer_in' || trans.type === 'interest' ? 'green' : 'red'}; font-weight: bold;">
+                                ${trans.type === 'credit' || trans.type === 'transfer_in' || trans.type === 'interest' ? '+' : '-'}£${Math.abs(trans.amount).toFixed(2)}
+                            </span><br>
+                            <small>Balance: £${trans.balance.toFixed(2)}</small>
+                        </div>
+                        <div class="transaction-actions">
+                            <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${index})">🗑️</button>
+                        </div>
+                    `;
+                    container.appendChild(transItem);
+                });
+                
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        // Add Transaction (Admin)
+        async function addTransaction() {
+            if (!editingUserId) return;
+            
+            const type = document.getElementById('editorTransType').value;
+            const amount = parseFloat(document.getElementById('editorAmount').value);
+            const description = document.getElementById('editorDescription').value;
+            const transDate = document.getElementById('editorTransDate').value;
+            const notifyUser = document.getElementById('editorNotifyUser').checked;
+            
+            if (!amount || amount <= 0) {
+                showAlert('editorAlert', 'Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (!description) {
+                showAlert('editorAlert', 'Please enter a description', 'error');
+                return;
+            }
+            
+            if (!transDate) {
+                showAlert('editorAlert', 'Please select a date', 'error');
+                return;
+            }
+            
+            try {
+                // Get current user data
+                const userDoc = await db.collection('users').doc(editingUserId).get();
+                const userData = userDoc.data();
+                
+                // Calculate new balance
+                let newBalance = userData.balance;
+                if (type === 'credit' || type === 'transfer_in' || type === 'interest') {
+                    newBalance += amount;
+                } else {
+                    newBalance -= amount;
+                }
+                
+                // Create transaction object
+                const transaction = {
+                    date: new Date(transDate).toISOString(),
+                    description: description,
+                    amount: type === 'credit' || type === 'transfer_in' || type === 'interest' ? amount : -amount,
+                    balance: newBalance,
+                    type: type,
+                    reference: 'ADMIN_ADJUSTMENT',
+                    processedBy: 'admin',
+                    processedAt: new Date().toISOString()
+                };
+                
+                // Update user document
+                await db.collection('users').doc(editingUserId).update({
+                    balance: newBalance,
+                    transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                });
+                
+                // Log admin activity
+                await logAdminActivity('TRANSACTION_ADDED', {
+                    userId: editingUserId,
+                    userEmail: userData.email,
+                    transactionType: type,
+                    amount: amount,
+                    description: description,
+                    transactionDate: transDate,
+                    newBalance: newBalance
+                });
+                
+                showAlert('editorAlert', 'Transaction added successfully!', 'success');
+                
+                // Clear form
+                document.getElementById('editorAmount').value = '';
+                document.getElementById('editorDescription').value = '';
+                document.getElementById('editorTransDate').valueAsDate = new Date();
+                
+                // Refresh data
+                await loadUserTransactions(editingUserId);
+                
+                // Update current balance display
+                document.getElementById('editorCurrentBalance').textContent = newBalance.toFixed(2);
+                
+                // Refresh main user list
+                await loadAllUsers();
+                
+            } catch (error) {
+                showAlert('editorAlert', 'Error adding transaction: ' + error.message, 'error');
+            }
+        }
+
+        // Delete Transaction (Admin)
+        async function deleteTransaction(index) {
+            if (!editingUserId || !confirm('Are you sure you want to delete this transaction? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const userDoc = await db.collection('users').doc(editingUserId).get();
+                const userData = userDoc.data();
+                const transactions = userData.transactions || [];
+                
+                if (index < 0 || index >= transactions.length) {
+                    alert('Invalid transaction index');
+                    return;
+                }
+                
+                // Remove transaction from array
+                const transactionToDelete = transactions[index];
+                const updatedTransactions = transactions.filter((_, i) => i !== index);
+                
+                // Recalculate balance
+                let newBalance = userData.balance;
+                if (transactionToDelete.type === 'credit' || transactionToDelete.type === 'transfer_in' || transactionToDelete.type === 'interest') {
+                    newBalance -= transactionToDelete.amount;
+                } else {
+                    newBalance += Math.abs(transactionToDelete.amount);
+                }
+                
+                // Update user document
+                await db.collection('users').doc(editingUserId).update({
+                    balance: newBalance,
+                    transactions: updatedTransactions
+                });
+                
+                // Log admin activity
+                await logAdminActivity('TRANSACTION_DELETED', {
+                    userId: editingUserId,
+                    userEmail: userData.email,
+                    transactionIndex: index,
+                    transactionAmount: transactionToDelete.amount,
+                    transactionDescription: transactionToDelete.description,
+                    newBalance: newBalance
+                });
+                
+                // Refresh data
+                await loadUserTransactions(editingUserId);
+                document.getElementById('editorCurrentBalance').textContent = newBalance.toFixed(2);
+                
+                alert('Transaction deleted successfully!');
+                
+            } catch (error) {
+                alert('Error deleting transaction: ' + error.message);
+            }
+        }
+
+        // View User Details
+        async function viewUserDetails(userId) {
+            try {
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                
+                let details = `User Details:\n`;
+                details += `Name: ${userData.lastName}\n`;
+                details += `Email: ${userData.email}\n`;
+                details += `Account: ${userData.accountNumber}\n`;
+                details += `Type: ${userData.accountType}\n`;
+                details += `Balance: £${userData.balance?.toFixed(2) || '0.00'}\n`;
+                details += `Created: ${userData.createdAt?.toDate().toLocaleString() || 'N/A'}\n`;
+                details += `Created By: ${userData.createdBy || 'Self'}\n`;
+                details += `Last Login: ${userData.lastLogin?.toDate().toLocaleString() || 'Never'}\n`;
+                details += `Transactions: ${userData.transactions?.length || 0}`;
+                
+                alert(details);
+                
+            } catch (error) {
+                alert('Error loading user details: ' + error.message);
+            }
+        }
+
+        // Update User Balance
+        async function updateUserBalance(userId) {
+            const newBalanceInput = document.getElementById(`editBalance_${userId}`);
+            const newBalance = parseFloat(newBalanceInput.value);
+            
+            if (!newBalance || isNaN(newBalance) || newBalance < 0) {
+                alert('Please enter a valid balance (must be 0 or positive)');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to set this user's balance to £${newBalance.toFixed(2)}?`)) {
+                return;
+            }
+            
+            try {
+                // Get current user data
+                const userDoc = await db.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                const oldBalance = userData.balance;
+                
+                // Create adjustment transaction if there's a change
+                if (oldBalance !== newBalance) {
+                    const adjustmentAmount = newBalance - oldBalance;
+                    const transaction = {
+                        date: new Date().toISOString(),
+                        description: 'Balance Update',
+                        amount: adjustmentAmount,
+                        balance: newBalance,
+                        type: adjustmentAmount >= 0 ? 'credit' : 'debit',
+                        reference: 'BALANCE_UPDATE',
+                        processedBy: 'admin',
+                        processedAt: new Date().toISOString()
+                    };
+                    
+                    // Update user document
+                    await db.collection('users').doc(userId).update({
+                        balance: newBalance,
+                        transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                    });
+                    
+                    // Log admin activity
+                    await logAdminActivity('BALANCE_UPDATED', {
+                        userId: userId,
+                        userEmail: userData.email,
+                        oldBalance: oldBalance,
+                        newBalance: newBalance,
+                        adjustmentAmount: adjustmentAmount
+                    });
+                    
+                    alert('Balance updated successfully!');
+                } else {
+                    alert('Balance is already at £' + newBalance.toFixed(2));
+                }
+                
+                await loadAllUsers();
+                
+            } catch (error) {
+                alert('Error updating balance: ' + error.message);
+            }
+        }
+
+        // Log Admin Activity
+        async function logAdminActivity(action, details) {
+            try {
+                await db.collection('admin_logs').add({
+                    action: action,
+                    details: details,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    ipAddress: 'N/A'
+                });
+            } catch (error) {
+                console.error('Error logging admin activity:', error);
+            }
+        }
+
+        // View System Logs
+        async function viewSystemLogs() {
+            try {
+                const logsSnapshot = await db.collection('admin_logs')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .get();
+                
+                let logsHTML = '<h3>Recent System Logs (Last 50)</h3><table class="user-table"><thead><tr><th>Time</th><th>Action</th><th>Details</th></tr></thead><tbody>';
+                
+                if (logsSnapshot.empty) {
+                    logsHTML += '<tr><td colspan="3">No logs found</td></tr>';
+                } else {
+                    logsSnapshot.forEach(doc => {
+                        const log = doc.data();
+                        logsHTML += `
+                            <tr>
+                                <td>${log.timestamp?.toDate().toLocaleString() || 'N/A'}</td>
+                                <td>${log.action || 'N/A'}</td>
+                                <td><small>${JSON.stringify(log.details || {})}</small></td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                logsHTML += '</tbody></table>';
+                
+                const modalHTML = `
+                    <div class="modal-overlay">
+                        <div class="modal" style="max-width: 1000px; max-height: 80vh; overflow-y: auto;">
+                            ${logsHTML}
+                            <div style="margin-top: 20px; text-align: center;">
+                                <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+            } catch (error) {
+                alert('Error loading system logs: ' + error.message);
+            }
+        }
+
+        // Refresh Admin Users
+        function refreshAdminUsers() {
+            loadAllUsers();
+            alert('User list refreshed!');
+        }
+
+        // Export Users to CSV
+        function exportUsersToCSV() {
+            const rows = document.querySelectorAll('#adminUsersList tr');
+            let csv = 'Last Name,Email,Account Type,Sort Code,Card Number,Account Number,Balance\n';
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).slice(0, 7).map(cell => {
+                    let text = cell.textContent.trim();
+                    if (text.includes('Update')) {
+                        text = text.split('Update')[0].trim();
+                        text = text.replace('£', '').trim();
+                    }
+                    text = text.replace(/,/g, '');
+                    if (text.includes(' ') || text.includes('"')) {
+                        text = `"${text.replace(/"/g, '""')}"`;
+                    }
+                    return text;
+                }).join(',');
+                csv += rowData + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'barclays-users-' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            alert('CSV export started!');
+        }
+
+        // Hide Modal
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Logout Admin
+        function logoutAdmin() {
+            auth.signOut();
+        }
+
+        // Show receipt for transaction
+        function showReceipt(transactionData) {
+            const receiptContent = document.getElementById('receiptContent');
+            
+            // Determine processing time based on transaction type
+            let processingTime = "1-2 working days";
+            let contactInfo = "For queries, contact your account manager at 0800 123 4567";
+            
+            if (transactionData.type === 'international') {
+                processingTime = "3-5 working days";
+                contactInfo = "For international transfer queries, contact international banking at 0800 999 8888";
+            } else if (transactionData.type === 'withdrawal') {
+                processingTime = "Instant";
+                contactInfo = "For cash withdrawal issues, contact card services at 0800 111 2222";
+            } else if (transactionData.type === 'domestic_transfer') {
+                processingTime = "Same day if before 3:30 PM";
+            }
+            
+            // Format date and time
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const formattedTime = now.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Generate receipt number
+            const receiptNumber = 'RCP' + Math.floor(100000000 + Math.random() * 900000000);
+            
+            // Create receipt HTML
+            receiptContent.innerHTML = `
+                <div class="receipt-header">
+                    <h2 style="color: var(--barclays-blue); margin-bottom: 10px;">BARCLAYS BANK</h2>
+                    <p style="color: var(--barclays-gray); margin-bottom: 5px;">Transaction Receipt</p>
+                    <p style="font-weight: bold;">Receipt No: ${receiptNumber}</p>
+                    <p>Date: ${formattedDate} | Time: ${formattedTime}</p>
+                </div>
+                
+                <div class="receipt-details">
+                    <div class="receipt-row">
+                        <span>Transaction Type:</span>
+                        <span style="font-weight: bold;">${transactionData.description}</span>
+                    </div>
+                    
+                    ${transactionData.recipientName ? `
+                    <div class="receipt-row">
+                        <span>Recipient Name:</span>
+                        <span>${transactionData.recipientName}</span>
+                    </div>
+                    ` : ''}
+                    
+                    ${transactionData.recipientAccount ? `
+                    <div class="receipt-row">
+                        <span>Recipient Account:</span>
+                        <span>${transactionData.recipientAccount}</span>
+                    </div>
+                    ` : ''}
+                    
+                    ${transactionData.sortCode ? `
+                    <div class="receipt-row">
+                        <span>Sort Code:</span>
+                        <span>${transactionData.sortCode}</span>
+                    </div>
+                    ` : ''}
+                    
+                    ${transactionData.reference ? `
+                    <div class="receipt-row">
+                        <span>Reference:</span>
+                        <span>${transactionData.reference}</span>
+                    </div>
+                    ` : ''}
+                    
+                    ${transactionData.transferReason ? `
+                    <div class="receipt-row">
+                        <span>Transfer Reason:</span>
+                        <span>${transactionData.transferReason}</span>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="receipt-row">
+                        <span>Amount:</span>
+                        <span style="font-weight: bold; color: ${transactionData.amount > 0 ? 'green' : 'red'}">
+                            ${transactionData.amount > 0 ? '+' : ''}£${Math.abs(transactionData.amount).toFixed(2)}
+                        </span>
+                    </div>
+                    
+                    <div class="receipt-row">
+                        <span>From Account:</span>
+                        <span>${currentUserData.accountNumber} (${currentUserData.lastName})</span>
+                    </div>
+                    
+                    <div class="receipt-row">
+                        <span>Transaction ID:</span>
+                        <span style="font-family: monospace;">${'TRX' + Date.now() + Math.floor(Math.random() * 1000)}</span>
+                    </div>
+                    
+                    <div class="receipt-row">
+                        <span>Status:</span>
+                        <span style="color: var(--barclays-success); font-weight: bold;">✅ Processing</span>
+                    </div>
+                </div>
+                
+                <div class="processing-time" style="text-align: center; padding: 20px; background: #fff3cd; border-radius: 6px; margin: 20px 0;">
+                    <h4>⏱️ Processing Time</h4>
+                    <p style="font-size: 18px; margin: 10px 0;">${processingTime}</p>
+                    <p style="font-size: 14px; color: var(--barclays-gray);">
+                        This transaction will be processed within the specified time frame.
+                        You'll receive a confirmation email once completed.
+                    </p>
+                </div>
+                
+                <div class="receipt-footer">
+                    <h4>📞 Need Assistance?</h4>
+                    <p>${contactInfo}</p>
+                    <p>Email: customerservice@barclays.co.uk</p>
+                    <p>24/7 Fraud Line: 0800 333 366</p>
+                    <div class="contact-info">
+                        <p>Your Account Manager: John Smith</p>
+                        <p>📞 020 7116 7000 | ✉️ account.manager@barclays.co.uk</p>
+                    </div>
+                </div>
+            `;
+            
+            // Store receipt data for download
+            currentReceiptData = {
+                ...transactionData,
+                receiptNumber,
+                formattedDate,
+                formattedTime,
+                processingTime,
+                contactInfo,
+                fromAccount: currentUserData.accountNumber,
+                fromName: currentUserData.lastName
+            };
+            
+            // Show receipt modal
+            document.getElementById('receiptModal').classList.remove('hidden');
+        }
+
+        // Print receipt
+        function printReceipt() {
+            const receiptContent = document.getElementById('receiptContent').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Barclays Receipt</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .bank-receipt { max-width: 600px; margin: 0 auto; }
+                        @media print {
+                            button { display: none !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${receiptContent}
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button onclick="window.print()" style="padding: 10px 20px; background: #00aeef; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Print Now
+                        </button>
+                        <button onclick="window.location.reload()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 4px; margin-left: 10px; cursor: pointer;">
+                            Close
+                        </button>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            window.print();
+            document.body.innerHTML = originalContent;
+            showReceipt(currentReceiptData); // Restore receipt
+        }
+
+        // Download receipt as text file
+        function downloadReceipt() {
+            const receipt = currentReceiptData;
+            if (!receipt) return;
+            
+            const receiptText = `
+BARCLAYS BANK - TRANSACTION RECEIPT
+====================================
+Receipt Number: ${receipt.receiptNumber}
+Date: ${receipt.formattedDate} | Time: ${receipt.formattedTime}
+
+TRANSACTION DETAILS
+-------------------
+Transaction Type: ${receipt.description}
+Amount: £${Math.abs(receipt.amount).toFixed(2)}
+${receipt.recipientName ? `Recipient: ${receipt.recipientName}` : ''}
+${receipt.recipientAccount ? `Recipient Account: ${receipt.recipientAccount}` : ''}
+${receipt.sortCode ? `Sort Code: ${receipt.sortCode}` : ''}
+${receipt.reference ? `Reference: ${receipt.reference}` : ''}
+From Account: ${receipt.fromAccount} (${receipt.fromName})
+Transaction ID: ${'TRX' + Date.now()}
+
+PROCESSING INFORMATION
+----------------------
+Status: Processing
+Estimated Processing: ${receipt.processingTime}
+
+CONTACT INFORMATION
+-------------------
+${receipt.contactInfo}
+24/7 Fraud Line: 0800 333 366
+Account Manager: John Smith
+Email: account.manager@barclays.co.uk
+Phone: 020 7116 7000
+
+IMPORTANT NOTES
+---------------
+1. Keep this receipt for your records
+2. Processing times are estimates
+3. Contact us immediately if you notice any unauthorized transactions
+4. Funds will appear in recipient's account once processed
+
+Generated: ${new Date().toLocaleString()}
+            `;
+            
+            const blob = new Blob([receiptText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Barclays-Receipt-${receipt.receiptNumber}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Close receipt
+        function closeReceipt() {
+            document.getElementById('receiptModal').classList.add('hidden');
+            currentReceiptData = null;
+        }
+
+        // Transfer Functions
+        function showTransferModal() {
+            document.getElementById('transferModal').classList.remove('hidden');
+            document.getElementById('modalTransferAlert').style.display = 'none';
+            document.getElementById('modalTransferAlert').textContent = '';
+            
+            // Reset form values
+            document.getElementById('modalRecipientName').value = '';
+            document.getElementById('modalRecipientSortCode').value = '';
+            document.getElementById('modalRecipientAccountNumber').value = '';
+            document.getElementById('modalTransferAmount').value = '';
+            document.getElementById('modalTransferReference').value = '';
+            
+            document.getElementById('intRecipientName').value = '';
+            document.getElementById('intBankName').value = '';
+            document.getElementById('intBankAddress').value = '';
+            document.getElementById('intAccountNumber').value = '';
+            document.getElementById('intSwiftCode').value = '';
+            document.getElementById('intTransferAmount').value = '';
+            document.getElementById('transferReason').value = '';
+            document.getElementById('intReference').value = '';
+            
+            // Reset to domestic transfer
+            selectTransferType('domestic');
+        }
+
+        function selectTransferType(type) {
+            currentTransferType = type;
+            
+            // Update button styles
+            document.getElementById('domesticTransferBtn').classList.remove('active');
+            document.getElementById('internationalTransferBtn').classList.remove('active');
+            document.getElementById(type + 'TransferBtn').classList.add('active');
+            
+            // Show/hide forms
+            document.getElementById('domesticTransferForm').classList.toggle('hidden', type !== 'domestic');
+            document.getElementById('internationalTransferForm').classList.toggle('hidden', type !== 'international');
+        }
+
+        async function processModalTransfer() {
+            let amount, recipientName, recipientAccount, sortCode, reference, transferReason;
+            
+            if (currentTransferType === 'domestic') {
+                amount = parseFloat(document.getElementById('modalTransferAmount').value);
+                recipientName = document.getElementById('modalRecipientName').value;
+                recipientAccount = document.getElementById('modalRecipientAccountNumber').value;
+                sortCode = document.getElementById('modalRecipientSortCode').value;
+                reference = document.getElementById('modalTransferReference').value;
+                
+                if (!amount || amount <= 0 || !recipientName || !recipientAccount || !sortCode) {
+                    showAlert('modalTransferAlert', 'Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                // REMOVED: No balance check - transactions don't affect balance
+                // if (amount > currentUserData.balance) {
+                //     showAlert('modalTransferAlert', 'Insufficient funds', 'error');
+                //     return;
+                // }
+            } else {
+                amount = parseFloat(document.getElementById('intTransferAmount').value);
+                recipientName = document.getElementById('intRecipientName').value;
+                recipientAccount = document.getElementById('intAccountNumber').value;
+                sortCode = document.getElementById('intSwiftCode').value;
+                reference = document.getElementById('intReference').value;
+                transferReason = document.getElementById('transferReason').value;
+                
+                if (!amount || amount <= 0 || !recipientName || !recipientAccount || !sortCode) {
+                    showAlert('modalTransferAlert', 'Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                // REMOVED: No balance check - transactions don't affect balance
+                // if (amount > currentUserData.balance) {
+                //     showAlert('modalTransferAlert', 'Insufficient funds', 'error');
+                //     return;
+                // }
+            }
+            
+            try {
+                // DON'T change the balance - keep it the same
+                const newBalance = currentUserData.balance; // Balance remains unchanged
+                
+                // Create transaction object (but don't save it to Firebase)
+                const transaction = {
+                    date: new Date().toISOString(),
+                    description: currentTransferType === 'domestic' ? 'Domestic Transfer' : 'International Transfer',
+                    amount: -amount,
+                    balance: newBalance,
+                    type: currentTransferType === 'domestic' ? 'transfer_out' : 'international_out',
+                    reference: reference || 'TRANSFER',
+                    processedBy: 'user',
+                    processedAt: new Date().toISOString()
+                };
+                
+                // DON'T update user balance in Firebase
+                // await db.collection('users').doc(currentUser.uid).update({
+                //     balance: newBalance,
+                //     transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                // });
+                
+                // Update local data (temporarily for display only)
+                currentUserData.transactions = currentUserData.transactions || [];
+                currentUserData.transactions.push(transaction);
+                
+                // Show success message
+                showAlert('modalTransferAlert', 'Transfer processed successfully! A receipt has been generated.', 'success');
+                
+                // Hide modal after 1 second
+                setTimeout(() => {
+                    hideModal('transferModal');
+                    
+                    // Show receipt
+                    showReceipt({
+                        type: currentTransferType === 'domestic' ? 'domestic_transfer' : 'international',
+                        description: currentTransferType === 'domestic' ? 'Domestic Transfer' : 'International Transfer',
+                        amount: -amount,
+                        recipientName: recipientName,
+                        recipientAccount: recipientAccount,
+                        sortCode: sortCode,
+                        reference: reference,
+                        transferReason: transferReason
+                    });
+                    
+                    // DON'T update the dashboard balance display - keep it the same
+                    // document.getElementById('currentBalance').textContent = newBalance.toFixed(2);
+                    loadTransactions();
+                }, 1000);
+                
+            } catch (error) {
+                showAlert('modalTransferAlert', 'Error processing transfer: ' + error.message, 'error');
+            }
+        }
+
+        // Withdrawal Functions
+        function showWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('hidden');
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('withdrawDescription').value = '';
+        }
+
+        async function processWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const description = document.getElementById('withdrawDescription').value || 'Cash Withdrawal';
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            // REMOVED: No balance check - transactions don't affect balance
+            // if (amount > currentUserData.balance) {
+            //     alert('Insufficient funds');
+            //     return;
+            // }
+            
+            try {
+                // DON'T change the balance - keep it the same
+                const newBalance = currentUserData.balance; // Balance remains unchanged
+                
+                // Create transaction object (but don't save it to Firebase)
+                const transaction = {
+                    date: new Date().toISOString(),
+                    description: description,
+                    amount: -amount,
+                    balance: newBalance,
+                    type: 'debit',
+                    reference: 'WITHDRAWAL',
+                    processedBy: 'user',
+                    processedAt: new Date().toISOString()
+                };
+                
+                // DON'T update user balance in Firebase
+                // await db.collection('users').doc(currentUser.uid).update({
+                //     balance: newBalance,
+                //     transactions: firebase.firestore.FieldValue.arrayUnion(transaction)
+                // });
+                
+                // Update local data (temporarily for display only)
+                currentUserData.transactions = currentUserData.transactions || [];
+                currentUserData.transactions.push(transaction);
+                
+                // Hide modal
+                hideModal('withdrawModal');
+                
+                // Show receipt
+                showReceipt({
+                    type: 'withdrawal',
+                    description: description,
+                    amount: -amount
+                });
+                
+                // DON'T update the dashboard balance display - keep it the same
+                // document.getElementById('currentBalance').textContent = newBalance.toFixed(2);
+                loadTransactions();
+                
+            } catch (error) {
+                alert('Error processing withdrawal: ' + error.message);
+            }
+        }
+
+        // Utility Functions
+        function showAlert(elementId, message, type = 'success') {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.textContent = message;
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function resetRegistrationForm() {
+            document.getElementById('lastName').value = '';
+            document.getElementById('birthDay').value = '';
+            document.getElementById('birthMonth').value = '';
+            document.getElementById('birthYear').value = '';
+            document.getElementById('postcode').value = '';
+            document.getElementById('sortCode').value = '';
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('confirmEmail').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            nextStep(1);
+        }
+
+        function logoutUser() {
+            auth.signOut();
+            currentUser = null;
+            currentUserData = null;
+            showLogin();
+        }
+
+        // Existing utility functions
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard: ' + text);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function showAccountDetailsReceipt() {
+            const now = new Date();
+            const formattedDate = now.toLocaleDateString('en-GB');
+            const formattedTime = now.toLocaleTimeString('en-GB');
+            
+            const receiptContent = document.getElementById('receiptContent');
+            receiptContent.innerHTML = `
+                <div class="receipt-header">
+                    <h2 style="color: var(--barclays-blue); margin-bottom: 10px;">BARCLAYS BANK</h2>
+                    <p style="color: var(--barclays-gray); margin-bottom: 5px;">Account Details Receipt</p>
+                    <p style="font-weight: bold;">Receipt No: ACD${Math.floor(100000000 + Math.random() * 900000000)}</p>
+                    <p>Date: ${formattedDate} | Time: ${formattedTime}</p>
+                </div>
+                
+                <div class="receipt-details">
+                    <div class="receipt-row">
+                        <span>Account Holder:</span>
+                        <span>${currentUserData.lastName}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Account Number:</span>
+                        <span>${currentUserData.accountNumber}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Sort Code:</span>
+                        <span>${currentUserData.sortCode}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Account Type:</span>
+                        <span>${currentUserData.accountType.charAt(0).toUpperCase() + currentUserData.accountType.slice(1)}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>IBAN:</span>
+                        <span>${currentUserData.iban || 'GB29BARC' + Math.floor(10000000000000 + Math.random() * 90000000000000)}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>SWIFT/BIC:</span>
+                        <span>${currentUserData.swift || 'BARCGB22'}</span>
+                    </div>
+                    <div class="receipt-row">
+                        <span>Current Balance:</span>
+                        <span style="font-weight: bold;">£${currentUserData.balance.toFixed(2)}</span>
+                    </div>
+                </div>
+                
+                <div class="receipt-footer">
+                    <h4>🔒 Security Information</h4>
+                    <p>Keep this receipt in a safe place. Do not share your account details with anyone.</p>
+                    <p>If you suspect fraudulent activity, call us immediately at 0800 333 366</p>
+                    <div class="contact-info">
+                        <p>Your Account Manager: John Smith</p>
+                        <p>📞 020 7116 7000 | ✉️ account.manager@barclays.co.uk</p>
+                    </div>
+                </div>
+            `;
+            
+            currentReceiptData = {
+                type: 'account_details',
+                description: 'Account Details Request',
+                fromAccount: currentUserData.accountNumber,
+                fromName: currentUserData.lastName
+            };
+            
+            document.getElementById('receiptModal').classList.remove('hidden');
+        }
+
+        function requestATMCard() {
+            alert('ATM Card request submitted. You will receive your new card within 5-7 working days. Please visit your nearest branch for immediate assistance.');
+        }
+
+        function showStatements() {
+            alert('Statement feature coming soon. Please contact your account manager for statements.');
+        }
+
+        // Firebase Auth State Listener
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    
+                    if (userDoc.exists) {
+                        currentUserData = userDoc.data();
+                        
+                        // Update last login timestamp
+                        await db.collection('users').doc(user.uid).update({
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        // Check if admin
+                        if (currentUserData.isAdmin) {
+                            showAdminPanel();
+                        } else {
+                            showDashboard();
+                        }
+                    } else {
+                        // Create account for new admin users
+                        const accountData = generateAccountDetails('current', 'User');
+                        
+                        await db.collection('users').doc(user.uid).set({
+                            uid: user.uid,
+                            lastName: 'User',
+                            email: user.email,
+                            accountType: 'current',
+                            sortCode: '20-00-00',
+                            cardNumber: Math.floor(1000000000000000 + Math.random() * 9000000000000000).toString(),
+                            accountNumber: accountData.accountNumber,
+                            membershipNumber: accountData.membershipNumber,
+                            iban: accountData.iban,
+                            swift: accountData.swift,
+                            balance: 0.00, // Start with 0.00
+                            isAdmin: user.email === ADMIN_EMAIL,
+                            createdBy: 'system',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                            transactions: []
+                        });
+                        
+                        const newUserDoc = await db.collection('users').doc(user.uid).get();
+                        currentUserData = newUserDoc.data();
+                        
+                        if (currentUserData.isAdmin) {
+                            showAdminPanel();
+                        } else {
+                            showDashboard();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                    auth.signOut();
+                    showLogin();
+                }
+            } else {
+                currentUser = null;
+                currentUserData = null;
+                showLogin();
+            }
+        });
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            showLogin();
+            
+            // Admin user creation function
+            window.createAdminUser = async function() {
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, 'admin123');
+                    const user = userCredential.user;
+                    
+                    const accountData = generateAccountDetails('admin', 'Administrator');
+                    
+                    await db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        lastName: 'Administrator',
+                        email: ADMIN_EMAIL,
+                        accountType: 'admin',
+                        sortCode: '99-99-99',
+                        cardNumber: '9999999999999999',
+                        accountNumber: accountData.accountNumber,
+                        membershipNumber: accountData.membershipNumber,
+                        iban: accountData.iban,
+                        swift: accountData.swift,
+                        balance: 0.00, // Start with 0.00
+                        isAdmin: true,
+                        createdBy: 'system',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        transactions: []
+                    });
+                    
+                    console.log('Admin user created! Please log in with:', ADMIN_EMAIL, 'and password: admin123');
+                    await auth.signOut();
+                    showLogin();
+                } catch (error) {
+                    console.error('Error creating admin:', error);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
